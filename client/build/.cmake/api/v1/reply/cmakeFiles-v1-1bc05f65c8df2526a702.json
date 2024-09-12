@@ -1,0 +1,608 @@
+{
+	"inputs" : 
+	[
+		{
+			"path" : "CMakeLists.txt"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.2/CMakeSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Darwin-Initialize.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.2/CMakeCCompiler.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.2/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeSystemSpecificInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeGenericSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeInitializeConfigs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Darwin.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/UnixPaths.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeCInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/AppleClang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-AppleClang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-Clang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/AppleClang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Compiler/Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-AppleClang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-Clang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Platform/Apple-Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonTargets.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindOpenSSL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPkgConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/usr/local/lib/cmake/Crow/CrowConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/usr/local/lib/cmake/Crow/Findasio.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindThreads.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckLibraryExists.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckIncludeFile.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckCSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/usr/local/lib/cmake/Crow/CrowTargets.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindThreads.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckLibraryExists.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckIncludeFile.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckCSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindCURL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPkgConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/SelectLibraryConfigurations.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/cpr/cprConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/cpr/cprConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindCURL.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPkgConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/cpr/cprTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/cpr/cprTargets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/inja/injaConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/inja/injaConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/inja/injaTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongocxx-3.10.2/mongocxx-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongocxx-3.10.2/mongocxx-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongoc-1.0/mongoc-1.0-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongoc-1.0/mongoc-1.0-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-1.0-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-1.0-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindThreads.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckLibraryExists.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckIncludeFile.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CheckCSourceCompiles.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_shared-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_shared-targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_static-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_static-targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongoc-1.0/mongoc-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongoc-1.0/mongoc-targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongoc-1.0/3rdParty/FindSASL2.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/FindPackageMessage.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-1.0-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-1.0-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_shared-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bson-1.0/bson_static-targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx_targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx_targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongocxx-3.10.2/mongocxx_targets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/mongocxx-3.10.2/mongocxx_targets-release.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx-config-version.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/Cellar/cmake/3.30.2/share/cmake/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/lib/cmake/bsoncxx-3.10.2/bsoncxx_targets.cmake"
+		}
+	],
+	"kind" : "cmakeFiles",
+	"paths" : 
+	{
+		"build" : "/Users/ilavaleev/DEV/simple_oauth2/client/build",
+		"source" : "/Users/ilavaleev/DEV/simple_oauth2/client"
+	},
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 1
+	}
+}

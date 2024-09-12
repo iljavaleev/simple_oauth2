@@ -1,0 +1,3 @@
+/Users/ilavaleev/Dev/OAUTH2/MongoDBT/build/CMakeFiles/resource.dir
+/Users/ilavaleev/Dev/OAUTH2/MongoDBT/build/CMakeFiles/edit_cache.dir
+/Users/ilavaleev/Dev/OAUTH2/MongoDBT/build/CMakeFiles/rebuild_cache.dir
