@@ -2,22 +2,19 @@
 #define DB_hpp
 
 #include <crow.h>
+#include <vector>
+#include <unordered_set>
+#include <optional>
+#include <memory>
+
+#include "Utils.hpp"
+
 #include <nlohmann/json.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
 
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
-#include <mongocxx/stdx.hpp>
 #include <mongocxx/client.hpp>
 
-#include <vector>
-#include <optional>
-#include <unordered_set>
-#include <optional>
-#include "Utils.hpp"
-#include <memory>
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
@@ -118,6 +115,7 @@ struct Client
     void create();
     static std::shared_ptr<Client> get(const std::string& client_id); 
     static bool destroy(const std::string& client_id);
+    static std::vector<std::shared_ptr<Client>> get_all();
 };
 
 struct Code
@@ -128,7 +126,7 @@ struct Code
     Code(
         const std::string& _code,
         const std::string& _query, 
-        const std::unordered_set<std::string>& _scopes):
+        const std::unordered_set<std::string> _scopes):
         code(_code), query(_query), scopes(_scopes){}
     
     void create();
@@ -148,12 +146,27 @@ struct Token
     Token(
         const std::string& _token, 
         const std::string& _client_id,
-        const std::unordered_set<std::string>& _scopes,
+        const std::string& _expire,
+        const std::unordered_set<std::string> _scopes,
         TokenType _type):
-    token(_token), client_id(_client_id), scopes(_scopes), type(_type){}
+    token(_token), 
+    client_id(_client_id), 
+    expire(_expire), 
+    scopes(_scopes), 
+    type(_type){}
+
+    Token(
+        const std::string& _token, 
+        const std::string& _client_id,
+        const std::unordered_set<std::string> _scopes,
+        TokenType _type):
+    token(_token), 
+    client_id(_client_id),  
+    scopes(_scopes), 
+    type(_type){}
     
     std::shared_ptr<std::string> create();
-    static std::string get_client(const std::string& token, TokenType type);
+    static std::shared_ptr<Token> get(const std::string& token, TokenType type);
     static bool destroy(const std::string& client_id, TokenType type);
     static bool destroy_all(const std::string& client_id);
 };

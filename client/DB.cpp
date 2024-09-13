@@ -1,21 +1,16 @@
 #include "DB.hpp"
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/result/delete.hpp>
+
 #include <unordered_set>
+#include <memory>
 
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <memory>
 
-#include <chrono>
-#include <ctime>
-#include <iomanip>
+
+
 using namespace std::literals;
 
 using bsoncxx::builder::basic::kvp;
@@ -108,13 +103,12 @@ std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
         return std::shared_ptr<Token>();
     std::unordered_set<std::string> scopes;
    
-    bsoncxx::array::view subarr{doc->view()["scopes"].get_array().value};
+    bsoncxx::array::view subarr{doc->view()["scope"].get_array().value};
     for (bsoncxx::array::element ele : subarr)
         scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
     
-    
     return std::make_shared<Token>(
-        bsoncxx::string::to_string(doc->view()["token"].get_string().value),
+        bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
         bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
         type == TokenType::access ? 
             bsoncxx::string::to_string(

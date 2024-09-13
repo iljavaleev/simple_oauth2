@@ -1,7 +1,10 @@
 #include "Handlers.hpp"
-#include "Utils.hpp"
+
+
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
+
+#include "Utils.hpp"
 #include "DB.hpp"
 
 using json = nlohmann::json;
@@ -15,7 +18,6 @@ std::string state{};
 std::string protected_resource = "http://localhost:9002/resource";
 
 
-
 crow::mustache::rendered_template idx::operator()(const crow::request& req) const
 {
     std::shared_ptr<Token> acc_token = 
@@ -24,10 +26,11 @@ crow::mustache::rendered_template idx::operator()(const crow::request& req) cons
         Token::get(client.client_id, TokenType::refresh);
     
     json render_json;
+  
     render_json["access_token"] = acc_token ? acc_token->token : "NONE";
     render_json["refresh_token"] = refr_token ? refr_token->token : "NONE";
     render_json["scope"] = acc_token ? get_scopes(acc_token->scopes) : "NONE";
-
+    
     std::string res = env.render(index_temp, render_json);
     auto page = crow::mustache::compile(res);
     return page.render();
@@ -90,7 +93,6 @@ crow::mustache::rendered_template callback::operator()(
         };
         templ = index_temp;
     }
-   
 	res = env.render(templ, render_json);
 	auto page = crow::mustache::compile(res);
     return page.render();
@@ -111,22 +113,23 @@ crow::mustache::rendered_template fetch_resource::operator()(
     }
     
     json response = get_answer(client, protected_resource);
-    if (response.empty())
+    if (response.contains("error") && response["error"] < 500)
     {  
         client.access_token = "";
         if(refresh_token(client, server.token_endpoint))
+        {
             response = get_answer(client, protected_resource);
-        else
-            client.refresh_token = "";
+            if(response.contains("error") && response["error"] < 500)
+                client.refresh_token = "";
+        }    
     }
 
-    if (response.empty())
+    if (response.contains("error"))
     {   
         res = env.render(error_temp, {{"error", "Unable to fetch data."}});
         auto page = crow::mustache::compile(res);
         return page.render();
     }
-    
     render_json["resource"] = response.dump(4);
     res = env.render(data_temp, render_json);
     auto page = crow::mustache::compile(res);

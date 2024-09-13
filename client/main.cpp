@@ -1,10 +1,9 @@
 #include <crow.h>
 #include <nlohmann/json.hpp>
-#include "Handlers.hpp"
-#include <memory>
 #include "DB.hpp"
-
- Client cl(
+#include "Handlers.hpp"
+ 
+Client cl(
     "oauth-client-1", 
     "oauth-client-secret-1",
     {"http://localhost:9000/callback", "http://localhost:9000/fetch_resource"}, 

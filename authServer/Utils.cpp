@@ -1,15 +1,14 @@
 #include "Utils.hpp"
-#include <nlohmann/json.hpp>
+
 #include <sstream>
-#include "crow.h"
 #include <iostream>
-#include <utility>
-#include <format>
 #include <string>
 #include <curl/curl.h>
-#include <sstream>
 #include <unordered_set>
 #include <string>
+
+#include "crow.h"
+#include <nlohmann/json.hpp>
 
 using nlohmann::json;
 
@@ -126,10 +125,10 @@ std::string url_decode(const std::string& encoded)
     return result;
 }
 
-std::unordered_set<std::string> get_scopes(const std::string& query)
+std::unordered_set<std::string> get_scopes(const std::string& scopes)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(url_decode(query));
+    std::istringstream iss(scopes);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);
@@ -140,6 +139,8 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
 {
     std::ostringstream ss;
     for (const auto& s: scopes)
-        ss << s << ' ';
-    return ss.str();
+        ss << s << " ";
+    std::string res = ss.str();
+    res.pop_back();
+    return res;
 }

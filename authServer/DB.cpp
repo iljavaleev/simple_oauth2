@@ -1,21 +1,17 @@
 #include "DB.hpp"
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/result/delete.hpp>
+
 #include <unordered_set>
+#include <memory>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 #include <bsoncxx/string/to_string.hpp>
-#include <memory>
 
-#include <chrono>
-#include <ctime>
-#include <iomanip>
 using namespace std::literals;
 
 using bsoncxx::builder::basic::kvp;
@@ -86,6 +82,33 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
         scopes
     );
 }
+
+ std::vector<std::shared_ptr<Client>> Client::get_all()
+ {
+    std::vector<std::shared_ptr<Client>> res;
+    auto clients_doc = db->get_client_collection().find({});
+    for (auto client: clients_doc)
+    {
+        std::vector<std::string> uris;
+        std::unordered_set<std::string> scopes;
+        bsoncxx::array::view subarr{client["redirect_uris"].get_array().value};
+        for (bsoncxx::array::element ele : subarr)
+            uris.push_back(bsoncxx::string::to_string(ele.get_string().value));           
+        
+        subarr = client["scope"].get_array().value;
+        for (bsoncxx::array::element ele : subarr)
+            scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
+
+        res.push_back(std::make_shared<Client>(
+            bsoncxx::string::to_string(client["client_id"].get_string().value),
+            bsoncxx::string::to_string(
+                client["client_secret"].get_string().value),
+            uris,
+            scopes
+        ));
+    }
+    return res;
+ }
 
 bool Client::destroy(const std::string& client_id)
 {   
@@ -204,8 +227,9 @@ std::shared_ptr<std::string> Token::create()
     {
         const std::chrono::time_point<std::chrono::system_clock> now = 
             std::chrono::system_clock::now();
-        const std::time_t t_c = std::chrono::system_clock::to_time_t(now + std::chrono::days(10));
-            std::string res{std::to_string(t_c)};
+        const std::time_t t_c = std::chrono::system_clock::to_time_t(
+            now + std::chrono::days(10));
+        std::string res{std::to_string(t_c)};
         doc.append(kvp("expire", res));
         std::stringstream s;
         s << std::put_time(std::localtime(&t_c), "Token expires at %T %F");
@@ -215,7 +239,9 @@ std::shared_ptr<std::string> Token::create()
     
     auto prev = bsoncxx::builder::basic::document{};
     prev.append(kvp("client_id", client_id));
-    prev.append(kvp(token_type, true));
+    // db.server.find({"access_token": {$exists: true}})
+    
+    prev.append(kvp(token_type, make_document(kvp("$exists", true))));
 
     auto outer = bsoncxx::builder::basic::document{};
     outer.append(kvp("$set", doc));
@@ -225,17 +251,35 @@ std::shared_ptr<std::string> Token::create()
     return expire_string;
 }
 
-std::string Token::get_client(const std::string& token, TokenType type)
+
+
+std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
 {
+    
     std::string token_type{"access_token"};
     if (type == TokenType::refresh)
         token_type = "refresh_token";
+    
     auto doc = db->get_token_collection().
         find_one(make_document(kvp(token_type, token)));
     if (!doc)
-        return "";
-    return bsoncxx::string::to_string(
-        doc->view()["client_id"].get_string().value);
+        return std::shared_ptr<Token>();
+    std::unordered_set<std::string> scopes;
+   
+    bsoncxx::array::view subarr{doc->view()["scope"].get_array().value};
+    for (bsoncxx::array::element ele : subarr)
+        scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
+    
+    
+    return std::make_shared<Token>(
+        bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
+        bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
+        (type == TokenType::access) ? 
+            bsoncxx::string::to_string(
+                doc->view()["expire"].get_string().value) : "",
+        scopes,
+        type
+    );
 }
 
 bool Token::destroy_all(const std::string& client_id)

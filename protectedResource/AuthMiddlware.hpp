@@ -1,14 +1,16 @@
 #ifndef AuthMiddlware_hpp
 #define AuthMiddlware_hpp
 
-#include "crow.h"
 #include <string>
+#include <unordered_set>
+
+#include "crow.h"
 #include <nlohmann/json.hpp>
 #include "DB.hpp"
-#include <unordered_set>
 
 
 using json = nlohmann::json;
+
 
 struct AuthMW: crow::ILocalMiddleware
 {
@@ -51,16 +53,45 @@ struct AuthMW: crow::ILocalMiddleware
             }
         }
 
-        Auth a;
-        auto scope = a.get_scope(token);
-        if(scope.empty())
+
+        auto token_inst = DB::get(token);
+        json j_error;
+        if(!token_inst)
         {
             res.code = 401;
+            j_error  = {"error", "no such access token exists"};
+            res.body = j_error.dump();
             res.end();
             return;
         }
-        ctx.token = token;
-        ctx.scope = scope;
+        const long exp = std::stoll(token_inst->expire);
+        const std::chrono::time_point now{std::chrono::system_clock::now()};
+        const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+        
+        if (exp - t_c < 0)
+        {
+            res.code = 401;
+            j_error  = {"error", "аccess token has expired"};
+            res.body = j_error.dump();
+            res.end();
+            return;
+        }
+
+        std::unordered_set<std::string> possible_scopes{"foo", "bar"};
+        for (const auto& s: token_inst->scope)
+        {
+            if (!possible_scopes.contains(s))
+            {
+                 res.code = 401;
+                j_error  = {"error", "no such scope exists"};
+                res.body = j_error.dump();
+                res.end();
+                return;
+            }
+        }
+
+        ctx.token = token_inst->token;
+        ctx.scope = token_inst->scope;
     }
 
     void after_handle(crow::request& req, crow::response& res, context& ctx){}

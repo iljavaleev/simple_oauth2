@@ -1,13 +1,11 @@
 
 #include "Utils.hpp"
 
-#include <ctime>
 #include <iostream>
-#include <unistd.h>
-#include <nlohmann/json.hpp>
 #include <sstream>
+
 #include <cpr/cpr.h>
-#include <stdexcept>
+#include <nlohmann/json.hpp>
 #include "DB.hpp"
 
 using json = nlohmann::json;
@@ -49,7 +47,6 @@ std::string encode_client_credentials(
     std::ostringstream ss;
     ss << crow::utility::base64encode(client_id, client_id.size()) << ':';
     ss << crow::utility::base64encode(client_secret, client_secret.size());
-    std::cout << ss.str() << std::endl;
     return ss.str();
 }
 
@@ -79,7 +76,8 @@ bool get_token(
         client.access_token = response["access_token"];
         if(response.contains("refresh_token"))
             client.refresh_token = response["refresh_token"];
-        client.scopes = get_scopes(response["scope"].dump());
+        client.scopes = get_scopes(
+            response["scope"].template get<std::string>());
         ret = true;
     }
     return ret;
@@ -123,14 +121,16 @@ json get_answer(const Client& client, const std::string& uri)
         cpr::Header{{"Authorization", "Bearer " + client.access_token}});
     json response;
     if (r.status_code >= 200 && r.status_code < 300)
-        response = json::parse(r.text);    
+        response = json::parse(r.text);
+    else
+        response["error"] = r.status_code;
     return response;
 }
 
-std::unordered_set<std::string> get_scopes(const std::string& query)
+std::unordered_set<std::string> get_scopes(const std::string& scopes)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(url_decode(query));
+    std::istringstream iss(scopes);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);
@@ -141,8 +141,10 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
 {
     std::ostringstream ss;
     for (const auto& s: scopes)
-        ss << s << ' ';
-    return ss.str();
+        ss << s << " ";
+    std::string res = ss.str();
+    res.pop_back();
+    return res;
 }
 
 std::string url_encode(const std::string& decoded)

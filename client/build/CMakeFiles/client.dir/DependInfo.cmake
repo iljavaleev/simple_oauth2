@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/ilavaleev/DEV/simple_oauth2/client/DB.cpp" "CMakeFiles/client.dir/DB.cpp.o" "gcc" "CMakeFiles/client.dir/DB.cpp.o.d"
-  "/Users/ilavaleev/DEV/simple_oauth2/client/Handlers.cpp" "CMakeFiles/client.dir/Handlers.cpp.o" "gcc" "CMakeFiles/client.dir/Handlers.cpp.o.d"
-  "/Users/ilavaleev/DEV/simple_oauth2/client/Utils.cpp" "CMakeFiles/client.dir/Utils.cpp.o" "gcc" "CMakeFiles/client.dir/Utils.cpp.o.d"
-  "/Users/ilavaleev/DEV/simple_oauth2/client/main.cpp" "CMakeFiles/client.dir/main.cpp.o" "gcc" "CMakeFiles/client.dir/main.cpp.o.d"
+  "/Users/ilavaleev/Dev/simple_oauth2/client/DB.cpp" "CMakeFiles/client.dir/DB.cpp.o" "gcc" "CMakeFiles/client.dir/DB.cpp.o.d"
+  "/Users/ilavaleev/Dev/simple_oauth2/client/Handlers.cpp" "CMakeFiles/client.dir/Handlers.cpp.o" "gcc" "CMakeFiles/client.dir/Handlers.cpp.o.d"
+  "/Users/ilavaleev/Dev/simple_oauth2/client/Utils.cpp" "CMakeFiles/client.dir/Utils.cpp.o" "gcc" "CMakeFiles/client.dir/Utils.cpp.o.d"
+  "/Users/ilavaleev/Dev/simple_oauth2/client/main.cpp" "CMakeFiles/client.dir/main.cpp.o" "gcc" "CMakeFiles/client.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

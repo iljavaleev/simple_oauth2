@@ -9,14 +9,10 @@ int main()
     
     CROW_ROUTE(app, "/resource")
     .CROW_MIDDLEWARES(app, AuthMW)
-    .methods(crow::HTTPMethod::GET, crow::HTTPMethod::POST)(Resource(app));
+    .methods(crow::HTTPMethod::POST)(Resource(app));
     
-    CROW_ROUTE(app, "/words")
-    .CROW_MIDDLEWARES(app, AuthMW)
-    .methods(
-        crow::HTTPMethod::GET, 
-        crow::HTTPMethod::POST, 
-        crow::HTTPMethod::DELETE)(Words(app));
+    CROW_ROUTE(app, "/")
+    .methods(crow::HTTPMethod::GET)(idx());
 
     app.port(9002).run();
     return 0;

@@ -1,7 +1,9 @@
-#include <crow.h>
-#include <nlohmann/json.hpp>
-#include "Handlers.hpp"
-#include "DB.hpp"
+#include <crow.h>  
+#include <string>          
+#include <vector>  
+        
+#include "DB.hpp"         
+#include "Handlers.hpp"    
 
 int main()
 {
@@ -14,7 +16,10 @@ int main()
     client.create();
     
     crow::SimpleApp app;
-    crow::mustache::set_global_base("../files");
+    
+    CROW_ROUTE(app, "/")
+    .methods(crow::HTTPMethod::GET)(idx());
+
     CROW_ROUTE(app, "/authorize")
     .methods(crow::HTTPMethod::GET)(authorize());
 

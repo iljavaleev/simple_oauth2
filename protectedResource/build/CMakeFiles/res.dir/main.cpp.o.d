@@ -1,5 +1,5 @@
 CMakeFiles/res.dir/main.cpp.o: \
-  /Users/ilavaleev/Dev/OAUTH2/protectedResource/main.cpp \
+  /Users/ilavaleev/Dev/simple_oauth2/protectedResource/main.cpp \
   /usr/local/include/crow.h /usr/local/include/crow/query_string.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1/stdio.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1/__config \
@@ -1485,7 +1485,8 @@ CMakeFiles/res.dir/main.cpp.o: \
   /usr/local/include/crow/http_server.h \
   /usr/local/include/crow/version.h /usr/local/include/crow/app.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1/condition_variable \
-  /Users/ilavaleev/Dev/OAUTH2/protectedResource/AuthMiddlware.hpp \
+  /Users/ilavaleev/Dev/simple_oauth2/protectedResource/AuthMiddlware.hpp \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1/unordered_set \
   /opt/homebrew/include/nlohmann/json.hpp \
   /opt/homebrew/include/nlohmann/adl_serializer.hpp \
   /opt/homebrew/include/nlohmann/detail/abi_macros.hpp \
@@ -1567,68 +1568,7 @@ CMakeFiles/res.dir/main.cpp.o: \
   /opt/homebrew/include/nlohmann/ordered_map.hpp \
   /opt/homebrew/include/nlohmann/detail/macro_unscope.hpp \
   /opt/homebrew/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
-  /Users/ilavaleev/Dev/OAUTH2/protectedResource/DB.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/document.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/document-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/core.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/core-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/prelude.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/util.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/compiler.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/config.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/export.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/version.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/postlude.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/value.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/value-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types/bson_value/view-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/element.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/element-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/element.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/element-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/enums/type.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types/bson_value/value-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/optional.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/optional.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/type_traits.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/functional.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/utility.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/string_view.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/string.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/value.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/value-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/type_traits.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/decimal128.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/decimal128-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/oid.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/oid-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/enums/binary_sub_type.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/key_context.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/closed_context-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/key_context-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/value_context.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/value_context-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/array_context.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/array_context-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/single_context-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/concatenate.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/concatenate-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view_or_value.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/view_or_value.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/view_or_value-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view_or_value.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/closed_context.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/helpers.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/stream/single_context.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/json.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/json-fwd.hpp \
-  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/string/to_string.hpp \
+  /Users/ilavaleev/Dev/simple_oauth2/protectedResource/DB.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/uri.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/client-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/config/prelude.hpp \
@@ -1639,13 +1579,44 @@ CMakeFiles/res.dir/main.cpp.o: \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/config/postlude.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/pool-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/uri-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/prelude.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/util.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/compiler.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/config.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/export.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/version.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/config/postlude.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/element.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/element-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/element-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/enums/type.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types/bson_value/value-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types/bson_value/view-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/optional.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/optional.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/type_traits.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/functional.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/utility.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/string_view.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc/core/string.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/string/view_or_value.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/string/view_or_value-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/view_or_value.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/view_or_value-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/read_concern.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/collection-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/database-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/options/transaction-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/read_concern-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/value.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/value-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/element.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/stdx/type_traits.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/options/transaction.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/client_session-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/read_preference-fwd.hpp \
@@ -1654,6 +1625,10 @@ CMakeFiles/res.dir/main.cpp.o: \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/read_preference.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/events/topology_description-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/search_index_view-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/view_or_value.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/value.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/array/value-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/document/view_or_value.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/write_concern.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/bulk_write-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/instance.hpp \
@@ -1675,6 +1650,16 @@ CMakeFiles/res.dir/main.cpp.o: \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_array.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_array-fwd.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/helpers.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/concatenate.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/concatenate-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/core.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/core-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/types.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/decimal128.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/decimal128-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/oid.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/oid-fwd.hpp \
+  /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/enums/binary_sub_type.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_document.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_document-fwd.hpp \
   /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/builder/basic/kvp.hpp \
@@ -1813,5 +1798,4 @@ CMakeFiles/res.dir/main.cpp.o: \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/options/tls.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/options/tls-fwd.hpp \
   /opt/homebrew/include/mongocxx/v_noabi/mongocxx/options/client_encryption.hpp \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1/unordered_set \
-  /Users/ilavaleev/Dev/OAUTH2/protectedResource/Handlers.hpp
+  /Users/ilavaleev/Dev/simple_oauth2/protectedResource/Handlers.hpp

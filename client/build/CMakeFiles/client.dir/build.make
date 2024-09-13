@@ -53,10 +53,10 @@ RM = /opt/homebrew/Cellar/cmake/3.30.2/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/ilavaleev/DEV/simple_oauth2/client
+CMAKE_SOURCE_DIR = /Users/ilavaleev/Dev/simple_oauth2/client
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/ilavaleev/DEV/simple_oauth2/client/build
+CMAKE_BINARY_DIR = /Users/ilavaleev/Dev/simple_oauth2/client/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/client.dir/depend.make
@@ -70,60 +70,60 @@ include CMakeFiles/client.dir/progress.make
 include CMakeFiles/client.dir/flags.make
 
 CMakeFiles/client.dir/main.cpp.o: CMakeFiles/client.dir/flags.make
-CMakeFiles/client.dir/main.cpp.o: /Users/ilavaleev/DEV/simple_oauth2/client/main.cpp
+CMakeFiles/client.dir/main.cpp.o: /Users/ilavaleev/Dev/simple_oauth2/client/main.cpp
 CMakeFiles/client.dir/main.cpp.o: CMakeFiles/client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/client.dir/main.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/main.cpp.o -MF CMakeFiles/client.dir/main.cpp.o.d -o CMakeFiles/client.dir/main.cpp.o -c /Users/ilavaleev/DEV/simple_oauth2/client/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/client.dir/main.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/main.cpp.o -MF CMakeFiles/client.dir/main.cpp.o.d -o CMakeFiles/client.dir/main.cpp.o -c /Users/ilavaleev/Dev/simple_oauth2/client/main.cpp
 
 CMakeFiles/client.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/main.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/DEV/simple_oauth2/client/main.cpp > CMakeFiles/client.dir/main.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/Dev/simple_oauth2/client/main.cpp > CMakeFiles/client.dir/main.cpp.i
 
 CMakeFiles/client.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/main.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/DEV/simple_oauth2/client/main.cpp -o CMakeFiles/client.dir/main.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/Dev/simple_oauth2/client/main.cpp -o CMakeFiles/client.dir/main.cpp.s
 
 CMakeFiles/client.dir/Handlers.cpp.o: CMakeFiles/client.dir/flags.make
-CMakeFiles/client.dir/Handlers.cpp.o: /Users/ilavaleev/DEV/simple_oauth2/client/Handlers.cpp
+CMakeFiles/client.dir/Handlers.cpp.o: /Users/ilavaleev/Dev/simple_oauth2/client/Handlers.cpp
 CMakeFiles/client.dir/Handlers.cpp.o: CMakeFiles/client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/client.dir/Handlers.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/Handlers.cpp.o -MF CMakeFiles/client.dir/Handlers.cpp.o.d -o CMakeFiles/client.dir/Handlers.cpp.o -c /Users/ilavaleev/DEV/simple_oauth2/client/Handlers.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/client.dir/Handlers.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/Handlers.cpp.o -MF CMakeFiles/client.dir/Handlers.cpp.o.d -o CMakeFiles/client.dir/Handlers.cpp.o -c /Users/ilavaleev/Dev/simple_oauth2/client/Handlers.cpp
 
 CMakeFiles/client.dir/Handlers.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/Handlers.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/DEV/simple_oauth2/client/Handlers.cpp > CMakeFiles/client.dir/Handlers.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/Dev/simple_oauth2/client/Handlers.cpp > CMakeFiles/client.dir/Handlers.cpp.i
 
 CMakeFiles/client.dir/Handlers.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/Handlers.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/DEV/simple_oauth2/client/Handlers.cpp -o CMakeFiles/client.dir/Handlers.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/Dev/simple_oauth2/client/Handlers.cpp -o CMakeFiles/client.dir/Handlers.cpp.s
 
 CMakeFiles/client.dir/DB.cpp.o: CMakeFiles/client.dir/flags.make
-CMakeFiles/client.dir/DB.cpp.o: /Users/ilavaleev/DEV/simple_oauth2/client/DB.cpp
+CMakeFiles/client.dir/DB.cpp.o: /Users/ilavaleev/Dev/simple_oauth2/client/DB.cpp
 CMakeFiles/client.dir/DB.cpp.o: CMakeFiles/client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/client.dir/DB.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/DB.cpp.o -MF CMakeFiles/client.dir/DB.cpp.o.d -o CMakeFiles/client.dir/DB.cpp.o -c /Users/ilavaleev/DEV/simple_oauth2/client/DB.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/client.dir/DB.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/DB.cpp.o -MF CMakeFiles/client.dir/DB.cpp.o.d -o CMakeFiles/client.dir/DB.cpp.o -c /Users/ilavaleev/Dev/simple_oauth2/client/DB.cpp
 
 CMakeFiles/client.dir/DB.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/DB.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/DEV/simple_oauth2/client/DB.cpp > CMakeFiles/client.dir/DB.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/Dev/simple_oauth2/client/DB.cpp > CMakeFiles/client.dir/DB.cpp.i
 
 CMakeFiles/client.dir/DB.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/DB.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/DEV/simple_oauth2/client/DB.cpp -o CMakeFiles/client.dir/DB.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/Dev/simple_oauth2/client/DB.cpp -o CMakeFiles/client.dir/DB.cpp.s
 
 CMakeFiles/client.dir/Utils.cpp.o: CMakeFiles/client.dir/flags.make
-CMakeFiles/client.dir/Utils.cpp.o: /Users/ilavaleev/DEV/simple_oauth2/client/Utils.cpp
+CMakeFiles/client.dir/Utils.cpp.o: /Users/ilavaleev/Dev/simple_oauth2/client/Utils.cpp
 CMakeFiles/client.dir/Utils.cpp.o: CMakeFiles/client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/client.dir/Utils.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/Utils.cpp.o -MF CMakeFiles/client.dir/Utils.cpp.o.d -o CMakeFiles/client.dir/Utils.cpp.o -c /Users/ilavaleev/DEV/simple_oauth2/client/Utils.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/client.dir/Utils.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/client.dir/Utils.cpp.o -MF CMakeFiles/client.dir/Utils.cpp.o.d -o CMakeFiles/client.dir/Utils.cpp.o -c /Users/ilavaleev/Dev/simple_oauth2/client/Utils.cpp
 
 CMakeFiles/client.dir/Utils.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/Utils.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/DEV/simple_oauth2/client/Utils.cpp > CMakeFiles/client.dir/Utils.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/ilavaleev/Dev/simple_oauth2/client/Utils.cpp > CMakeFiles/client.dir/Utils.cpp.i
 
 CMakeFiles/client.dir/Utils.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/Utils.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/DEV/simple_oauth2/client/Utils.cpp -o CMakeFiles/client.dir/Utils.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/ilavaleev/Dev/simple_oauth2/client/Utils.cpp -o CMakeFiles/client.dir/Utils.cpp.s
 
 # Object files for target client
 client_OBJECTS = \
@@ -148,7 +148,7 @@ client: /opt/homebrew/Cellar/openssl@3/3.3.1/lib/libssl.dylib
 client: /opt/homebrew/Cellar/openssl@3/3.3.1/lib/libcrypto.dylib
 client: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/libcurl.tbd
 client: CMakeFiles/client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable client"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/client.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -160,6 +160,6 @@ CMakeFiles/client.dir/clean:
 .PHONY : CMakeFiles/client.dir/clean
 
 CMakeFiles/client.dir/depend:
-	cd /Users/ilavaleev/DEV/simple_oauth2/client/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/ilavaleev/DEV/simple_oauth2/client /Users/ilavaleev/DEV/simple_oauth2/client /Users/ilavaleev/DEV/simple_oauth2/client/build /Users/ilavaleev/DEV/simple_oauth2/client/build /Users/ilavaleev/DEV/simple_oauth2/client/build/CMakeFiles/client.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /Users/ilavaleev/Dev/simple_oauth2/client/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/ilavaleev/Dev/simple_oauth2/client /Users/ilavaleev/Dev/simple_oauth2/client /Users/ilavaleev/Dev/simple_oauth2/client/build /Users/ilavaleev/Dev/simple_oauth2/client/build /Users/ilavaleev/Dev/simple_oauth2/client/build/CMakeFiles/client.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/client.dir/depend
 

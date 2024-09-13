@@ -1,11 +1,13 @@
 #ifndef Handlers_hpp
 #define Handlers_hpp
 
+#include <string>
+#include <memory>
+
 #include "crow.h"
 #include <nlohmann/json.hpp>
-#include <string>
 #include "DB.hpp"
-#include <memory>
+
 
 struct idx{
     Client client;
@@ -45,7 +47,6 @@ struct fetch_resource{
         client(_client), server(_server){}
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
-
 
 
 #endif

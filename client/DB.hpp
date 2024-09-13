@@ -1,23 +1,21 @@
 #ifndef DB_hpp
 #define DB_hpp
 
-#include <crow.h>
-#include <nlohmann/json.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/client.hpp>
-
 #include <vector>
 #include <optional>
 #include <unordered_set>
 #include <optional>
 #include <memory>
+
+#include <crow.h>
+#include <nlohmann/json.hpp>
+
+#include <mongocxx/uri.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/client.hpp>
+
 #include "Utils.hpp"
+
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;

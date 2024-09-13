@@ -6,7 +6,7 @@ CXX_DEFINES = -DASIO_STANDALONE
 
 CXX_INCLUDES = -I/opt/homebrew/Cellar/openssl@3/3.3.1/include -isystem /usr/local/include -isystem /opt/homebrew/include -isystem /opt/homebrew/include/mongocxx/v_noabi -isystem /opt/homebrew/include/bsoncxx/v_noabi/bsoncxx/third_party/mnmlstc -isystem /opt/homebrew/include/bsoncxx/v_noabi
 
-CXX_FLAGSarm64 =  -Wall -std=gnu++2b -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk
+CXX_FLAGSarm64 =  -Wall -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk
 
-CXX_FLAGS =  -Wall -std=gnu++2b -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk
+CXX_FLAGS =  -Wall -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk
 

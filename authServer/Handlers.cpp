@@ -1,19 +1,46 @@
 #include "Handlers.hpp"
-#include "Utils.hpp"
-#include <nlohmann/json.hpp>
-#include "DB.hpp"
+
+#include <crow.h>
 #include <memory>
 #include <algorithm>
-#include "Utils.hpp"
 #include <unordered_map>
 #include <string>
-#include "crow.h"
-#include <utility>
-#include <cpr/cpr.h>
-#include <format>
+#include <vector>
+
+#include "DB.hpp"
+#include "Utils.hpp"
+
 #include <inja/inja.hpp>
+#include <nlohmann/json.hpp>
+
 
 using json = nlohmann::json;
+
+inja::Environment env;
+inja::Template index_temp = env.parse_template("../files/index.html");
+inja::Template appr_temp = env.parse_template("../files/approve.html");
+inja::Template error_temp = env.parse_template("../files/error.html");
+
+
+crow::mustache::rendered_template idx::operator()(const crow::request& req) const
+{
+	std::vector<std::shared_ptr<Client>> clients = Client::get_all();
+	json render_json;
+	std::vector<json> res_json;
+	for (const auto& cl: clients)
+	{
+		json client_json;
+		client_json["client_id"] = cl->client_id;
+		client_json["client_secret"] = cl->client_secret;
+		client_json["scope"] = get_scopes(cl->scopes);
+		client_json["redirect_uri"] = cl->redirect_uris.at(0);
+		res_json.push_back(client_json);
+	}
+	render_json["clients"] = res_json;
+	std::string res = env.render(index_temp, render_json);
+	auto page = crow::mustache::compile(res);
+	return page.render();
+}
 
 
 crow::mustache::rendered_template authorize::operator()(const crow::request& req) const
@@ -21,41 +48,62 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
     auto err_page = crow::mustache::load("error.html");
     char* client_id_p = req.url_params.get("client_id");
     if (!client_id_p)
-        return err_page.render({{"error", "Unknown client"}});
+	{
+		std::string res = env.render(error_temp, {{"error", "Unknown client"}});
+		auto page = crow::mustache::compile(res);
+		return page.render();
+	}
     
     std::string client_id{client_id_p};
     std::shared_ptr<Client> client = Client::get(client_id);
     if(!client)
-       return err_page.render({{"error", "Unknown client"}});
+	{
+		std::string res = env.render(error_temp, {{"error", "Unknown client"}});
+		auto page = crow::mustache::compile(res);
+		return page.render();
+	}
+    
     std::vector r_uris = client->redirect_uris;
     
     if (!req.url_params.get("redirect_uri") || 
         std::find(r_uris.begin(), r_uris.end(), 
         std::string(req.url_params.get("redirect_uri"))) == r_uris.end())
     {
-        return err_page.render({{"error", "Invalid redirect URI"}});
+        std::string res = env.render(
+			error_temp, 
+			{{"error", "Invalid redirect URI"}});
+		auto page = crow::mustache::compile(res);
+		return page.render();
     }   
-	// scope 
-	if (!req.url_params.get("scope"))
-		return err_page.render({{"error", "Scope not found"}});
 	
-	// check scope eq
+	if (!req.url_params.get("scope"))
+	{
+		std::string res = env.render(
+			error_temp, 
+			{{"error", "Scope not found"}});
+		auto page = crow::mustache::compile(res);
+		return page.render();
+	}
+	
 	auto scopes = get_scopes(req.url_params.get("scope"));
 	for (const auto& el: scopes)
 	{
 		if(!client->scopes.contains(el))
-			return err_page.render({{"error", "invalid scope"}});
-
+		{
+			std::string res = env.render(
+			error_temp, 
+			{{"error", "invalid scope"}});
+			auto page = crow::mustache::compile(res);
+			return page.render();
+		}
 	}
 	    
-	// save query
 	crow::query_string query = req.url_params;
     const std::string reqid = gen_random(8);
     
 	Request request(reqid, req.raw_url);
 	request.create();
 	
-	// render
 	std::vector<std::string> client_scopes;
 	client_scopes.insert(
 		client_scopes.end(), 
@@ -67,9 +115,7 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
 	render_json["scopes"] = client_scopes;
 	render_json["reqid"] = reqid;
 	
-	inja::Environment env;
-	inja::Template temp = env.parse_template("../files/approve.html");
-	std::string res = env.render(temp, render_json);
+	std::string res = env.render(appr_temp, render_json);
 	auto page = crow::mustache::compile(res);
 	return page.render();
 }
@@ -108,7 +154,6 @@ crow::response approve::operator()(const crow::request& req) const
     std::shared_ptr<Client> client = Client::get(client_id);
 	std::string url_parsed;
 
-	// check subset
 	for (const auto& el: scopes)
 	{
 		if(!client->scopes.contains(el))
@@ -162,7 +207,6 @@ crow::response token::operator()(const crow::request& req) const
     crow::response resp;
 	std::string client_id, client_secret;
 	
-	// headers
 	auto auth_it = req.headers.find("authorization");
     if (auth_it != req.headers.end())
 	{
@@ -188,22 +232,22 @@ crow::response token::operator()(const crow::request& req) const
 	if (!client || client->client_secret != client_secret) 
 		return send_error("invalid_client", 401);
 	
-	// authorization grant request
 	if (!body.contains("grant_type") || 
 		!(body.at("grant_type") == "authorization_code" ||
 		body.at("grant_type") == "refresh_token")) 
 		return send_error("unsupported_grant_type", 400);
 
-	std::shared_ptr<Code> cod;
+	
+	std::unordered_set<std::string> scopes;
 	if (body.at("grant_type") == "authorization_code")
 	{
 		if (!body.contains("code"))
 			return send_error("invalid_grant", 400);
 		
-		cod = Code::get(body.at("code"));
+		std::shared_ptr<Code> cod = Code::get(body.at("code"));
 		if (!cod)
 			return send_error("invalid_grant", 400);
-		
+		scopes = cod->scopes;
 		Code::destroy(body.at("code"));
 		crow::query_string query(cod->query);	
 
@@ -212,33 +256,32 @@ crow::response token::operator()(const crow::request& req) const
 	}
 	else if (body.at("grant_type") == "refresh_token")
 	{
-		auto body = parse_form_data(req.body);
 		if (!body.contains("refresh_token"))
 			return send_error("invalid_grant", 400);
-		
-		std::string old_client_id = 
-			Token::get_client(body.at("refresh_token"), TokenType::refresh);
 
-		if (old_client_id.empty() || old_client_id != client_id)
+		auto old_token = 
+			Token::get(body.at("refresh_token"), TokenType::refresh);
+
+		if (!old_token || old_token->client_id != client_id)
 		{
 			Token::destroy(body.at("refresh_token"), TokenType::refresh);
 			return send_error("invalid_grant", 400);
 		}
-		else
-			Token::destroy_all(client_id);
+		scopes = old_token->scopes;
 	}
+	
 	std::string access_token = gen_random(16);
 	std::string refresh_token = gen_random(16);
-	Token acs_token(access_token, client_id, cod->scopes, TokenType::access);
+
+	Token acs_token(access_token, client_id, scopes, TokenType::access);
 	std::shared_ptr<std::string> exp = acs_token.create();
-	Token rfr_token(refresh_token, client_id, cod->scopes, TokenType::refresh);
-	rfr_token.create();
+	Token rfr_token(refresh_token, client_id, scopes, TokenType::refresh);
 	json res_resp = { 
 		{"access_token", access_token}, 
 		{"token_type", "Bearer"},
 		{"access_token expire", *exp },
 		{"refresh_token", refresh_token },
-		{ "scope", get_scopes(cod->scopes) } 
+		{ "scope", get_scopes(scopes) } 
 	};
 	resp.code = 200;
 	resp.body = res_resp.dump();
