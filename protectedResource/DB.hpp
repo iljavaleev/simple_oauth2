@@ -4,8 +4,9 @@
 #include <vector>
 #include <unordered_set>
 #include <memory>
+#include <format>
 
-#include <crow.h>
+#include "crow.h"
 #include <nlohmann/json.hpp>
 
 #include <mongocxx/uri.hpp>
@@ -43,8 +44,13 @@ class DB
     mongocxx::collection collection;
 public:
     DB(const std::string _db = "auth", const std::string _coll = "server")
-    {
-        uri = mongocxx::uri("mongodb://localhost:27017");
+    {   
+        uri = mongocxx::uri(std::format("mongodb://{}:{}@{}:{}", 
+            std::getenv("MONGO_USER"), 
+            std::getenv("MONGO_PASSWORD"),
+            std::getenv("MONGO_HOST"),
+            std::getenv("MONGO_PORT")
+        ));
         client = mongocxx::client(uri);
         db = client[_db]; 
         collection = db[_coll];

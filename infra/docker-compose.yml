@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+
+  mongo:
+    image: mongo:latest
+    env_file: 
+      - path: ./.env
+    restart: always
+    hostname: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    ports:
+      - ${MONGODB_PORT}:${MONGODB_PORT}
+    volumes:
+      - mongodb-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - services 
+
+  server:
+    image: valeevilja/oauth2_server:v1
+    container_name: server
+    restart: always
+    ports:
+      - 9001:9001
+    env_file:
+      - ./.env
+    environment:
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_HOST=${MONGODB_HOST}
+    volumes:
+      - ./:/server
+    networks:
+      - services 
+    depends_on:
+      - mongo
+
+  client:
+    image: valeevilja/oauth2_client:v1
+    container_name: client
+    restart: always
+    ports:
+      - 9000:9000
+    env_file:
+      - ./.env
+    environment:
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_HOST=${MONGODB_HOST}
+    volumes:
+      - ./:/client
+    networks:
+      - services 
+    depends_on:
+      - mongo
+
+  resource:
+    image: valeevilja/oauth2_resource:v1
+    container_name: resource
+    restart: always
+    ports:
+      - 9002:9002
+    env_file:
+      - ./.env
+    environment:
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_HOST=${MONGODB_HOST}
+    volumes:
+      - ./:/resource
+    networks:
+      - services 
+    depends_on:
+      - mongo  
+
+volumes:
+  mongodb-data:
+  mongo-config:
+
+networks:
+  services:

@@ -1,14 +1,13 @@
 #ifndef DB_hpp
 #define DB_hpp
 
-#include <crow.h>
+#include "crow.h"
 #include <vector>
 #include <unordered_set>
-#include <optional>
 #include <memory>
+#include <format>
 
 #include "Utils.hpp"
-
 #include <nlohmann/json.hpp>
 
 #include <mongocxx/uri.hpp>
@@ -34,7 +33,12 @@ class DB
 public:
     DB(const std::string _db = "auth")
     {
-        uri = mongocxx::uri("mongodb://localhost:27017");
+        uri = mongocxx::uri(std::format("mongodb://{}:{}@{}:{}", 
+            std::getenv("MONGO_USER"), 
+            std::getenv("MONGO_PASSWORD"),
+            std::getenv("MONGO_HOST"),
+            std::getenv("MONGO_PORT")
+        ));
         client = mongocxx::client(uri);
         db = client[_db]; 
         client_collection = db["client"];

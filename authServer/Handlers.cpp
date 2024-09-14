@@ -1,6 +1,6 @@
 #include "Handlers.hpp"
 
-#include <crow.h>
+#include "crow.h"
 #include <memory>
 #include <algorithm>
 #include <unordered_map>
@@ -10,7 +10,7 @@
 #include "DB.hpp"
 #include "Utils.hpp"
 
-#include <inja/inja.hpp>
+#include "inja.hpp"
 #include <nlohmann/json.hpp>
 
 
@@ -27,6 +27,7 @@ crow::mustache::rendered_template idx::operator()(const crow::request& req) cons
 	std::vector<std::shared_ptr<Client>> clients = Client::get_all();
 	json render_json;
 	std::vector<json> res_json;
+
 	for (const auto& cl: clients)
 	{
 		json client_json;
