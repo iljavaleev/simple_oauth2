@@ -13,7 +13,8 @@ struct idx{
     Client client;
     idx(const Client& _client): client(_client){}
     
-    crow::mustache::rendered_template operator()(const crow::request& req) const;
+    crow::mustache::rendered_template operator()(
+        const crow::request& req) const;
 };
 
 struct authorize{

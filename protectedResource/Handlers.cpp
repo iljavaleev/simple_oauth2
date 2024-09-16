@@ -20,7 +20,8 @@ json bar_resource = {
 };
 
 
-crow::mustache::rendered_template idx::operator()(const crow::request& req) const
+crow::mustache::rendered_template idx::operator()(
+    const crow::request& req) const
 {
     crow::mustache::set_base("../files");
     auto page = crow::mustache::load_text("index.html");

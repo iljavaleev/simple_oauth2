@@ -17,12 +17,14 @@
 using json = nlohmann::json;
 
 inja::Environment env;
-inja::Template index_temp = env.parse_template("../files/index.html");
-inja::Template appr_temp = env.parse_template("../files/approve.html");
-inja::Template error_temp = env.parse_template("../files/error.html");
+const std::string WORKDIR = std::getenv("WORKDIR");
+inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
+inja::Template appr_temp = env.parse_template(WORKDIR + "/files/approve.html");
+inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 
 
-crow::mustache::rendered_template idx::operator()(const crow::request& req) const
+crow::mustache::rendered_template idx::operator()(
+	const crow::request& req) const
 {
 	std::vector<std::shared_ptr<Client>> clients = Client::get_all();
 	json render_json;

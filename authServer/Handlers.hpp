@@ -5,12 +5,14 @@
 
 struct idx
 {
-    crow::mustache::rendered_template operator()(const crow::request& req) const;
+    crow::mustache::rendered_template operator()(
+        const crow::request& req) const;
 };
 
 struct authorize
 {
-    crow::mustache::rendered_template operator()(const crow::request& req) const;
+    crow::mustache::rendered_template operator()(
+        const crow::request& req) const;
 };
 
 struct approve

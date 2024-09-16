@@ -10,9 +10,10 @@
 using json = nlohmann::json;
 
 inja::Environment env;
-inja::Template error_temp = env.parse_template("../files/error.html");
-inja::Template data_temp = env.parse_template("../files/data.html");
-inja::Template index_temp = env.parse_template("../files/index.html");
+const std::string WORKDIR = std::getenv("WORKDIR");
+inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
+inja::Template data_temp = env.parse_template(WORKDIR + "/files/data.html");
+inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 
 std::string state{};
 std::string protected_resource = "http://localhost:9002/resource";

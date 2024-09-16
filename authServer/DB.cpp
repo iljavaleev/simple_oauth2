@@ -239,8 +239,6 @@ std::shared_ptr<std::string> Token::create()
     
     auto prev = bsoncxx::builder::basic::document{};
     prev.append(kvp("client_id", client_id));
-    // db.server.find({"access_token": {$exists: true}})
-    
     prev.append(kvp(token_type, make_document(kvp("$exists", true))));
 
     auto outer = bsoncxx::builder::basic::document{};

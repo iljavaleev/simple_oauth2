@@ -15,6 +15,7 @@ Server s("http://localhost:9001/authorize", "http://localhost:9001/token");
 int main()
 {
     crow::SimpleApp app;
+    app.loglevel(crow::LogLevel::Warning);
     CROW_ROUTE(app, "/").methods(
         crow::HTTPMethod::GET)(idx(cl));
     CROW_ROUTE(app, "/authorize").methods(

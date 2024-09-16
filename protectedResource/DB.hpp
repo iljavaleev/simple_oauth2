@@ -45,11 +45,9 @@ class DB
 public:
     DB(const std::string _db = "auth", const std::string _coll = "server")
     {   
-        uri = mongocxx::uri(std::format("mongodb://{}:{}@{}:{}", 
-            std::getenv("MONGO_USER"), 
-            std::getenv("MONGO_PASSWORD"),
-            std::getenv("MONGO_HOST"),
-            std::getenv("MONGO_PORT")
+        uri = mongocxx::uri(std::format("mongodb://{}:{}", 
+            std::getenv("MONGODB_HOST"),
+            std::getenv("MONGODB_PORT")
         ));
         client = mongocxx::client(uri);
         db = client[_db]; 

@@ -6,7 +6,8 @@
 
 
 struct idx{
-    crow::mustache::rendered_template operator()(const crow::request& req) const;
+    crow::mustache::rendered_template operator()(
+        const crow::request& req) const;
 };
 
 
