@@ -22,6 +22,7 @@ using bsoncxx::builder::basic::make_document;
  
 inline mongocxx::instance instance{};
 
+
 class DB
 {
     mongocxx::uri uri;
@@ -63,11 +64,13 @@ public:
     }
 };
 
+
 struct ProtectedResource
 {
     std::string uri;
     ProtectedResource(const std::string& _uri):uri(_uri){}
 };
+
 
 struct Server
 {
@@ -80,7 +83,6 @@ struct Server
         ):
         authorization_endpoint(_auth), token_endpoint(_token){}
 };
-
 
 
 struct Client
@@ -120,6 +122,7 @@ struct Client
 
 
 enum class TokenType { access, refresh };
+
 
 struct Token
 {

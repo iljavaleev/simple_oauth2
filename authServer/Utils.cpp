@@ -42,6 +42,7 @@ std::string build_url(std::string base, nlohmann::json options)
 
 }
 
+
 std::string encode_client_credentials(
     const std::string client_id,  
     const std::string client_secret)
@@ -51,6 +52,7 @@ std::string encode_client_credentials(
     ss << crow::utility::base64encode(client_secret, client_secret.size());
     return ss.str();
 }
+
 
 std::vector<std::string> decode_client_credentials(
     const std::string& code)
@@ -67,6 +69,7 @@ std::vector<std::string> decode_client_credentials(
     return { crow::utility::base64decode(id, id.size()), 
         crow::utility::base64decode(secret, secret.size()) };
 }
+
 
 std::unordered_map<std::string, std::string> parse_form_data(std::string form)
 {
@@ -112,6 +115,7 @@ std::string url_encode(const std::string& decoded)
     return result;
 }
 
+
 std::string url_decode(const std::string& encoded)
 {
     int output_length;
@@ -125,6 +129,7 @@ std::string url_decode(const std::string& encoded)
     return result;
 }
 
+
 std::unordered_set<std::string> get_scopes(const std::string& scopes)
 {
     std::unordered_set<std::string> res;
@@ -134,6 +139,7 @@ std::unordered_set<std::string> get_scopes(const std::string& scopes)
         res.insert(s);
     return res;
 }
+
 
 std::string get_scopes(const std::unordered_set<std::string>& scopes)
 {

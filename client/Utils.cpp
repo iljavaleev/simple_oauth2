@@ -26,6 +26,7 @@ std::string gen_random(const int len) {
     return tmp_s;
 }
 
+
 std::string build_url(std::string base, nlohmann::json options)
 {
     std::ostringstream url;
@@ -40,6 +41,7 @@ std::string build_url(std::string base, nlohmann::json options)
 
 }
 
+
 std::string encode_client_credentials(
     const std::string client_id,  
     const std::string client_secret)
@@ -49,6 +51,7 @@ std::string encode_client_credentials(
     ss << crow::utility::base64encode(client_secret, client_secret.size());
     return ss.str();
 }
+
 
 bool get_token(
     Client& client, 
@@ -82,6 +85,7 @@ bool get_token(
     }
     return ret;
 }
+
 
 bool refresh_token(
     Client& client, 
@@ -119,6 +123,7 @@ json get_answer(const Client& client, const std::string& uri)
     cpr::Response r = cpr::Post(
         cpr::Url{uri}, 
         cpr::Header{{"Authorization", "Bearer " + client.access_token}});
+    
     json response;
     if (r.status_code >= 200 && r.status_code < 300)
         response = json::parse(r.text);
@@ -168,4 +173,3 @@ std::string url_decode(const std::string& encoded)
     curl_free(decoded_value);
     return result;
 }
-

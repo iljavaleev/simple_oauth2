@@ -46,13 +46,14 @@ crow::mustache::rendered_template idx::operator()(
 }
 
 
-crow::mustache::rendered_template authorize::operator()(const crow::request& req) const
+crow::mustache::rendered_template authorize::operator()(
+	const crow::request& req) const
 {
-    auto err_page = crow::mustache::load("error.html");
-    char* client_id_p = req.url_params.get("client_id");
-    if (!client_id_p)
-	{
-		std::string res = env.render(error_temp, {{"error", "Unknown client"}});
+	char* client_id_p = req.url_params.get("client_id");
+    std::string res;
+	if (!client_id_p)
+	{	
+		res = env.render(error_temp, {{"error", "Unknown client"}});
 		auto page = crow::mustache::compile(res);
 		return page.render();
 	}
@@ -61,7 +62,7 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
     std::shared_ptr<Client> client = Client::get(client_id);
     if(!client)
 	{
-		std::string res = env.render(error_temp, {{"error", "Unknown client"}});
+		res = env.render(error_temp, {{"error", "Unknown client"}});
 		auto page = crow::mustache::compile(res);
 		return page.render();
 	}
@@ -72,18 +73,14 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
         std::find(r_uris.begin(), r_uris.end(), 
         std::string(req.url_params.get("redirect_uri"))) == r_uris.end())
     {
-        std::string res = env.render(
-			error_temp, 
-			{{"error", "Invalid redirect URI"}});
+        res = env.render(error_temp, {{"error", "Invalid redirect URI"}});
 		auto page = crow::mustache::compile(res);
 		return page.render();
     }   
 	
 	if (!req.url_params.get("scope"))
 	{
-		std::string res = env.render(
-			error_temp, 
-			{{"error", "Scope not found"}});
+		res = env.render(error_temp, {{"error", "Scope not found"}});
 		auto page = crow::mustache::compile(res);
 		return page.render();
 	}
@@ -93,9 +90,7 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
 	{
 		if(!client->scopes.contains(el))
 		{
-			std::string res = env.render(
-			error_temp, 
-			{{"error", "invalid scope"}});
+			res = env.render(error_temp, {{"error", "invalid scope"}});
 			auto page = crow::mustache::compile(res);
 			return page.render();
 		}
@@ -118,7 +113,7 @@ crow::mustache::rendered_template authorize::operator()(const crow::request& req
 	render_json["scopes"] = client_scopes;
 	render_json["reqid"] = reqid;
 	
-	std::string res = env.render(appr_temp, render_json);
+	res = env.render(appr_temp, render_json);
 	auto page = crow::mustache::compile(res);
 	return page.render();
 }
@@ -205,6 +200,7 @@ crow::response approve::operator()(const crow::request& req) const
     return resp;
 }
 
+
 crow::response token::operator()(const crow::request& req) const
 {
     crow::response resp;
@@ -289,5 +285,4 @@ crow::response token::operator()(const crow::request& req) const
 	resp.code = 200;
 	resp.body = res_resp.dump();
 	return resp;
-    
 }

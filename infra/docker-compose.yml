@@ -4,7 +4,7 @@ services:
 
   mongodb:
     image: mongo
-    container_name: db
+    container_name: mongo
     env_file: 
       - path: ./.env
     ports:
@@ -14,12 +14,12 @@ services:
 
   server:
     image: valeevilja/oauth2_server:v1
-    container_name: server
-    restart: always
-    ports:
-      - 9001:9001
     env_file:
       - ./.env
+    container_name: ${SERVER}
+    restart: always
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
     environment:
       - MONGODB_PORT=${MONGODB_PORT}
       - MONGODB_HOST=${MONGODB_HOST}
@@ -32,12 +32,12 @@ services:
 
   client:
     image: valeevilja/oauth2_client:v1
-    container_name: client
-    restart: always
-    ports:
-      - 9000:9000
     env_file:
       - ./.env
+    container_name: ${CLIENT}
+    restart: always
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}
     environment:
       - MONGODB_PORT=${MONGODB_PORT}
       - MONGODB_HOST=${MONGODB_HOST}
@@ -50,12 +50,12 @@ services:
 
   resource:
     image: valeevilja/oauth2_resource:v1
-    container_name: resource
-    restart: always
-    ports:
-      - 9002:9002
     env_file:
       - ./.env
+    container_name: ${RESOURCE}
+    restart: always
+    ports:
+      - ${RESOURCE_PORT}:${RESOURCE_PORT}
     environment:
       - MONGODB_PORT=${MONGODB_PORT}
       - MONGODB_HOST=${MONGODB_HOST}

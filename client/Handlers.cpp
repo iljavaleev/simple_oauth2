@@ -1,5 +1,6 @@
 #include "Handlers.hpp"
 
+#include <format>
 
 #include "inja.hpp"
 #include <nlohmann/json.hpp>
@@ -16,7 +17,16 @@ inja::Template data_temp = env.parse_template(WORKDIR + "/files/data.html");
 inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 
 std::string state{};
-std::string protected_resource = "http://localhost:9002/resource";
+const std::string protected_resource = std::format(
+    "http://{}:{}/resource", 
+    std::getenv("RESOURCE"), 
+    std::getenv("RESOURCE_PORT")
+);
+const std::string token_endpoint = std::format(
+    "http://{}:{}/token", 
+    std::getenv("SERVER"), 
+    std::getenv("SERVER_PORT")
+);
 
 
 crow::mustache::rendered_template idx::operator()(const crow::request& req) const
@@ -75,8 +85,8 @@ crow::mustache::rendered_template callback::operator()(
         auto page = crow::mustache::compile(res);
         return page.render();
     }
-
-    bool try_get = get_token(client, server.token_endpoint, std::string(code));
+    bool try_get = get_token(
+        client, token_endpoint, std::string(code));
     
     inja::Template templ;
 	if (!try_get)

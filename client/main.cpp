@@ -3,19 +3,22 @@
 #include "DB.hpp"
 #include "Handlers.hpp"
  
+
 Client cl(
     "oauth-client-1", 
     "oauth-client-secret-1",
     {"http://localhost:9000/callback", "http://localhost:9000/fetch_resource"}, 
-    "foo"
+    "foo bar"
 );
-    
+
+
 Server s("http://localhost:9001/authorize", "http://localhost:9001/token");
+
 
 int main()
 {
     crow::SimpleApp app;
-    app.loglevel(crow::LogLevel::Warning);
+ 
     CROW_ROUTE(app, "/").methods(
         crow::HTTPMethod::GET)(idx(cl));
     CROW_ROUTE(app, "/authorize").methods(

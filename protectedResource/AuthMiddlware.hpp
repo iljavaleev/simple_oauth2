@@ -53,8 +53,8 @@ struct AuthMW: crow::ILocalMiddleware
             }
         }
 
-
         auto token_inst = DB::get(token);
+
         json j_error;
         if(!token_inst)
         {

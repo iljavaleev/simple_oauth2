@@ -9,8 +9,6 @@
 using json = nlohmann::json;
 
 struct Client;
-
-
 std::string gen_random(const int len);
 std::string build_url(std::string base, nlohmann::json options);
 std::string encode_client_credentials(
@@ -30,4 +28,5 @@ std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);
 std::string url_decode(const std::string& encoded);
 std::string url_encode(const std::string& decoded);
+
 #endif

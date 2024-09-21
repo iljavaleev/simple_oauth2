@@ -19,6 +19,7 @@ using bsoncxx::builder::basic::sub_array;
 
 std::unique_ptr<DB> db = std::make_unique<DB>();
 
+
 void Client::create()
 {   
     mongocxx::options::update options;
@@ -56,6 +57,7 @@ void Client::create()
     }
 }
 
+
 std::shared_ptr<Client> Client::get(const std::string& client_id)
 {
     auto client_value = db->get_client_collection().
@@ -82,6 +84,7 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
         scopes
     );
 }
+
 
  std::vector<std::shared_ptr<Client>> Client::get_all()
  {
@@ -132,12 +135,14 @@ void Request::create()
     }
 }
 
+
 bool Request::destroy(const std::string& req_id)
 {
     auto res = db->get_request_collection().delete_one(
         make_document(kvp("req_id", req_id)));
     return res->deleted_count() != 0;
 }
+
 
 std::shared_ptr<Request> Request::get(const std::string& req_id)
 {
@@ -175,6 +180,7 @@ void Code::create()
     }
 }
 
+
 std::shared_ptr<Code> Code::get(const std::string& code)
 {
     auto code_value = db->get_code_collection().
@@ -195,6 +201,7 @@ std::shared_ptr<Code> Code::get(const std::string& code)
         scopes
     );
 }
+
 
 bool Code::destroy(const std::string& code)
 {
@@ -250,7 +257,6 @@ std::shared_ptr<std::string> Token::create()
 }
 
 
-
 std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
 {
     
@@ -280,12 +286,14 @@ std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
     );
 }
 
+
 bool Token::destroy_all(const std::string& client_id)
 {   
     auto res = db->get_token_collection().delete_many(
         make_document(kvp("client_id", client_id)));
     return res->deleted_count() != 0;
 }
+
 
 bool Token::destroy(const std::string& client_id, TokenType type)
 {   
@@ -298,4 +306,3 @@ bool Token::destroy(const std::string& client_id, TokenType type)
             kvp(token_type, true)));
     return res->deleted_count() != 0;
 }
-

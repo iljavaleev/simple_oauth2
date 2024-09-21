@@ -36,6 +36,7 @@ struct Token
     token(_token), client_id(_client_id), expire(_expire), scope(_scope){}
 };
 
+
 class DB
 {
     mongocxx::uri uri;

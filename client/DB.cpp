@@ -10,13 +10,14 @@
 #include <bsoncxx/string/to_string.hpp>
 
 
-
 using namespace std::literals;
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::sub_array;
 
+
 std::unique_ptr<DB> db = std::make_unique<DB>();
+
 
 void Client::create()
 {   
@@ -55,6 +56,7 @@ void Client::create()
     }
 }
 
+
 std::shared_ptr<Client> Client::get(const std::string& client_id)
 {
     auto client_value = db->get_client_collection().
@@ -81,6 +83,7 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
         scopes
     );
 }
+
 
 bool Client::destroy(const std::string& client_id)
 {   
@@ -118,12 +121,14 @@ std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
     );
 }
 
+
 bool Token::destroy_all(const std::string& client_id)
 {   
     auto res = db->get_token_collection().delete_many(
         make_document(kvp("client_id", client_id)));
     return res->deleted_count() != 0;
 }
+
 
 bool Token::destroy(const std::string& client_id, TokenType type)
 {   
@@ -136,4 +141,3 @@ bool Token::destroy(const std::string& client_id, TokenType type)
             kvp(token_type, true)));
     return res->deleted_count() != 0;
 }
-

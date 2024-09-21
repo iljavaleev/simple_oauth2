@@ -21,6 +21,7 @@ using bsoncxx::builder::basic::make_document;
  
 inline mongocxx::instance instance{};
 
+
 class DB
 {
     mongocxx::uri uri;
@@ -62,6 +63,7 @@ public:
     }
 };
 
+
 struct Server
 {
     std::string authorization_endpoint;
@@ -73,6 +75,7 @@ struct Server
         ):
         authorization_endpoint(_auth), token_endpoint(_token){}
 };
+
 
 struct Request
 {
@@ -87,6 +90,7 @@ struct Request
     static std::shared_ptr<Request> get(const std::string& req_id); 
     static bool destroy(const std::string& req_id);
 };
+
 
 struct Client
 {
@@ -120,6 +124,7 @@ struct Client
     static std::vector<std::shared_ptr<Client>> get_all();
 };
 
+
 struct Code
 {
     std::string code;
@@ -136,7 +141,9 @@ struct Code
     static bool destroy(const std::string& code);
 };
 
+
 enum class TokenType { access, refresh };
+
 
 struct Token
 {
@@ -172,5 +179,6 @@ struct Token
     static bool destroy(const std::string& client_id, TokenType type);
     static bool destroy_all(const std::string& client_id);
 };
+
 
 #endif
