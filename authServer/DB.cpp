@@ -211,7 +211,7 @@ bool Code::destroy(const std::string& code)
 }
 
 
-std::shared_ptr<std::string> Token::create()
+void Token::create()
 {
     mongocxx::options::update options;
     options.upsert(true);
@@ -228,20 +228,11 @@ std::shared_ptr<std::string> Token::create()
     
     std::shared_ptr<std::string> expire_string{nullptr};
     std::string token_type{"access_token"};
-    if (type == TokenType::refresh)
+    if (!expire)
         token_type = "refresh_token";
-    else
-    {
-        const std::chrono::time_point<std::chrono::system_clock> now = 
-            std::chrono::system_clock::now();
-        const std::time_t t_c = std::chrono::system_clock::to_time_t(
-            now + std::chrono::days(10));
-        std::string res{std::to_string(t_c)};
-        doc.append(kvp("expire", res));
-        std::stringstream s;
-        s << std::put_time(std::localtime(&t_c), "Token expires at %T %F");
-        expire_string = std::make_shared<std::string>(s.str());
-    }
+    
+    doc.append(kvp("expire", int64_t(expire)));
+
     doc.append(kvp(token_type, token));
     
     auto prev = bsoncxx::builder::basic::document{};
@@ -253,19 +244,61 @@ std::shared_ptr<std::string> Token::create()
 
     db->get_token_collection().update_one(
         prev.view(), outer.view(), options);
-    return expire_string;
+}
+
+void Token::create(
+    const std::string& token,
+    const std::string& client_id, 
+    std::time_t exp,
+    std::unordered_set<std::string> scopes    
+    )
+{
+    mongocxx::options::update options;
+    options.upsert(true);
+    
+    auto doc = bsoncxx::builder::basic::document{};
+    doc.append(kvp("client_id", client_id));
+    doc.append(kvp("scope", [&scopes](sub_array child) 
+    {
+        for (const auto& uri : scopes) 
+        {
+            child.append(uri);
+        }
+    }));
+    
+    std::string token_type{"access_token"};
+    if (!exp)
+        token_type = "refresh_token";
+    
+    doc.append(kvp("expire", int64_t(exp)));
+
+    std::string hash_token = std::to_string(std::hash<std::string>{}(token));
+
+    doc.append(kvp(token_type, hash_token));
+    
+    auto prev = bsoncxx::builder::basic::document{};
+    prev.append(kvp("client_id", client_id));
+    prev.append(kvp(token_type, make_document(kvp("$exists", true))));
+
+    auto outer = bsoncxx::builder::basic::document{};
+    outer.append(kvp("$set", doc));
+
+    db->get_token_collection().update_one(
+        prev.view(), outer.view(), options);
 }
 
 
-std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
+std::shared_ptr<Token> Token::get(
+    const std::string& token,
+    const std::string& type
+    )
 {
     
-    std::string token_type{"access_token"};
-    if (type == TokenType::refresh)
-        token_type = "refresh_token";
-    
+    std::size_t hash_token = std::hash<std::string>{}(token);
+    std::string token_type(std::move(type));
+
     auto doc = db->get_token_collection().
-        find_one(make_document(kvp(token_type, token)));
+        find_one(make_document(kvp(token_type, std::to_string(hash_token))));
     if (!doc)
         return std::shared_ptr<Token>();
     std::unordered_set<std::string> scopes;
@@ -278,11 +311,8 @@ std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
     return std::make_shared<Token>(
         bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
         bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
-        (type == TokenType::access) ? 
-            bsoncxx::string::to_string(
-                doc->view()["expire"].get_string().value) : "",
-        scopes,
-        type
+        doc->view()["expire"].get_int64(),
+        scopes
     );
 }
 
@@ -295,14 +325,12 @@ bool Token::destroy_all(const std::string& client_id)
 }
 
 
-bool Token::destroy(const std::string& client_id, TokenType type)
+bool Token::destroy(const std::string& client_id, const std::string& type)
 {   
-    std::string token_type{"access_token"};
-    if (type == TokenType::refresh)
-        token_type = "refresh_token";
+    std::string token_type{type};
     auto res = db->get_token_collection().delete_one(
         make_document(
             kvp("client_id", client_id), 
-            kvp(token_type, true)));
+            kvp(token_type, make_document(kvp("$exists", true)))));
     return res->deleted_count() != 0;
 }

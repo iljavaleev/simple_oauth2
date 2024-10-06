@@ -17,10 +17,12 @@ find_package(CURL)
 find_package(Boost REQUIRED system)
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
+find_package(jwt-cpp CONFIG REQUIRED)
+
 
 include_directories(/usr/local/include ${Boost_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
 
 add_executable(auth DB.cpp Handlers.cpp Utils.cpp main.cpp)
 
-target_link_libraries(auth ${PQXX_LIB} nlohmann_json::nlohmann_json mongo::mongocxx_shared mongo::bsoncxx_shared ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES})
+target_link_libraries(auth ${PQXX_LIB} jwt-cpp::jwt-cpp nlohmann_json::nlohmann_json mongo::mongocxx_shared mongo::bsoncxx_shared ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES})
 

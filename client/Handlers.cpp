@@ -17,6 +17,8 @@ inja::Template data_temp = env.parse_template(WORKDIR + "/files/data.html");
 inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 
 std::string state{};
+
+
 const std::string protected_resource = std::format(
     "http://{}:{}/resource", 
     std::getenv("RESOURCE"), 
@@ -29,26 +31,27 @@ const std::string token_endpoint = std::format(
 );
 
 
-crow::mustache::rendered_template idx::operator()(const crow::request& req) const
+crow::mustache::rendered_template idx::operator()(
+    const crow::request& req) const
 {
-    std::shared_ptr<Token> acc_token = 
-        Token::get(client.client_id, TokenType::access);
-    std::shared_ptr<Token> refr_token = 
-        Token::get(client.client_id, TokenType::refresh);
     
     json render_json;
-  
-    render_json["access_token"] = acc_token ? acc_token->token : "NONE";
-    render_json["refresh_token"] = refr_token ? refr_token->token : "NONE";
-    render_json["scope"] = acc_token ? get_scopes(acc_token->scopes) : "NONE";
+    render_json["access_token"] = !client.access_token.empty() ? 
+        client.access_token : "NONE";
+    render_json["refresh_token"] = !client.refresh_token.empty() ? 
+        client.refresh_token : "NONE";
+    render_json["scope"] = !client.scopes.empty() ? 
+        get_scopes(client.scopes) : "NONE";
     
     std::string res = env.render(index_temp, render_json);
     auto page = crow::mustache::compile(res);
     return page.render();
 }
 
+
 crow::response authorize::operator()(const crow::request& req) const
 {
+    srand((unsigned)time(NULL) * getpid());
     state = gen_random(12);
     json options = {
         {"response_type", "code"},
@@ -70,6 +73,12 @@ crow::mustache::rendered_template callback::operator()(
     
     json render_json;
     std::string res;
+    if (req.url_params.get("error"))
+    {
+        res = env.render(error_temp, {{"error", req.url_params.get("error")}});
+        auto page = crow::mustache::compile(res);
+        return page.render();
+    }
 
     if (!req.url_params.get("state") || req.url_params.get("state") != state)
     {
@@ -114,24 +123,21 @@ crow::mustache::rendered_template fetch_resource::operator()(
     const crow::request& req) const
 {
     json render_json;
-    std::string tamlate_path, res;
+    std::string res;
 
-    if(client.access_token.empty())
-    {
-        res = env.render(error_temp, {{"error", "Missing access token."}});
-        auto page = crow::mustache::compile(res);
-        return page.render();
-    }
-    
     json response = get_answer(client, protected_resource);
     if (response.contains("error") && response["error"] < 500)
     {  
-        client.access_token = "";
+        client.access_token.clear();
+        Token::destroy(client.client_id, "access_token");
         if(refresh_token(client, server.token_endpoint))
         {
             response = get_answer(client, protected_resource);
             if(response.contains("error") && response["error"] < 500)
-                client.refresh_token = "";
+            {
+                client.refresh_token.clear();                
+                Token::destroy_all(client.client_id);
+            }
         }    
     }
 
@@ -143,6 +149,60 @@ crow::mustache::rendered_template fetch_resource::operator()(
     }
     render_json["resource"] = response.dump(4);
     res = env.render(data_temp, render_json);
+    auto page = crow::mustache::compile(res);
+    return page.render();
+}
+
+
+crow::mustache::rendered_template revoke_handler::operator()(
+    const crow::request& req) const
+{
+    std::string res;
+    unsigned int status = revoke_token(client, "access_token");
+    if (status >= 200 && status < 300)
+    {
+        client.access_token.clear();
+        client.scopes.clear();
+        json render_json;
+        render_json["access_token"] = !client.access_token.empty() ? 
+            client.access_token : "NONE";
+        render_json["refresh_token"] = !client.refresh_token.empty() ? 
+            client.refresh_token : "NONE";
+        render_json["scope"] = !client.scopes.empty() ? 
+            get_scopes(client.scopes) : "NONE";
+        res = env.render(index_temp, render_json);
+    }
+    else
+    {
+        res = env.render(error_temp, {{"error", "Code not found"}});
+    }
+    auto page = crow::mustache::compile(res);
+    return page.render();
+}
+
+
+crow::mustache::rendered_template revoke_refresh_handler::operator()(
+    const crow::request& req) const
+{
+    std::string res;
+    unsigned int status = revoke_token(client, "refresh_token");
+    if (status >= 200 && status < 300)
+    {
+        client.access_token.clear();
+        client.refresh_token.clear();
+        json render_json;
+        render_json["access_token"] = !client.access_token.empty() ? 
+            client.access_token : "NONE";
+        render_json["refresh_token"] = !client.refresh_token.empty() ? 
+            client.refresh_token : "NONE";
+        render_json["scope"] = !client.scopes.empty() ? 
+            get_scopes(client.scopes) : "NONE";
+        res = env.render(index_temp, render_json);
+    }
+    else
+    {
+        res = env.render(error_temp, {{"error", "Code not found"}});
+    }
     auto page = crow::mustache::compile(res);
     return page.render();
 }

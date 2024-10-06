@@ -6,12 +6,15 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <format>
+#include <fstream>
 
 #include "DB.hpp"
 #include "Utils.hpp"
 
 #include "inja.hpp"
 #include <nlohmann/json.hpp>
+#include <jwt-cpp/jwt.h>
 
 
 using json = nlohmann::json;
@@ -22,6 +25,7 @@ inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 inja::Template appr_temp = env.parse_template(WORKDIR + "/files/approve.html");
 inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 
+extern ProtectedResource resource;
 
 crow::mustache::rendered_template idx::operator()(
 	const crow::request& req) const
@@ -89,7 +93,7 @@ crow::mustache::rendered_template authorize::operator()(
 	for (const auto& el: scopes)
 	{
 		if(!client->scopes.contains(el))
-		{
+		{	
 			res = env.render(error_temp, {{"error", "invalid scope"}});
 			auto page = crow::mustache::compile(res);
 			return page.render();
@@ -97,6 +101,7 @@ crow::mustache::rendered_template authorize::operator()(
 	}
 	    
 	crow::query_string query = req.url_params;
+	srand((unsigned)time(NULL) * getpid());
     const std::string reqid = gen_random(8);
     
 	Request request(reqid, req.raw_url);
@@ -151,22 +156,37 @@ crow::response approve::operator()(const crow::request& req) const
 	std::string client_id{query.get("client_id")};
     std::shared_ptr<Client> client = Client::get(client_id);
 	std::string url_parsed;
-
+	if (!client)
+	{
+		url_parsed = build_url(query.get("redirect_uri"), 
+				{{ "error", "denied access"}});
+		resp.redirect(url_parsed);
+		return resp;
+	}
+	
+	if(scopes.empty())
+	{
+		url_parsed = build_url(query.get("redirect_uri"), 
+				{{ "error", "denied access"}});
+		resp.redirect(url_parsed);
+		return resp;
+	}
+	
 	for (const auto& el: scopes)
 	{
 		if(!client->scopes.contains(el))
 		{
 			url_parsed = build_url(query.get("redirect_uri"), 
-				{ "error", "invalid scope"});
+				{{ "error", "invalid scope"}});
 			resp.redirect(url_parsed);
 			return resp;
 		}
 	}
-
+	
 	if (form.at("approve").empty())
 	{
 		url_parsed = build_url(query.get("redirect_uri"), 
-            { "error", "access_denied"});
+            {{ "error", "access_denied"}});
 		resp.redirect(url_parsed);
 		return resp;
 	}
@@ -178,24 +198,15 @@ crow::response approve::operator()(const crow::request& req) const
 		resp.redirect(url_parsed);
 		return resp;
 	} 
-	
-	std::string code = gen_random(8);
+	srand((unsigned)time(NULL) * getpid());
+	std::string code = gen_random(12);
 	Code code_inst(code, request->query, scopes);
+	
 	code_inst.create();
     
-	try
-    {
-        url_parsed = build_url(query.get("redirect_uri"), // check for keys
-            {{ "code", code }, { "state", query.get("state") }});
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-        url_parsed = build_url(query.get("redirect_uri"), 
-            {{ "error",  e.what()}});
-		resp.redirect(url_parsed);
-		return resp;
-    }
+    url_parsed = build_url(query.get("redirect_uri"), 
+		{{ "code", code }, { "state", query.get("state") }});
+	
 	resp.redirect_perm(url_parsed);
     return resp;
 }
@@ -257,32 +268,145 @@ crow::response token::operator()(const crow::request& req) const
 	{
 		if (!body.contains("refresh_token"))
 			return send_error("invalid_grant", 400);
-
+		
+		try
+		{
+			get_verifier().verify(jwt::decode(body.at("refresh_token")));
+		}
+		catch(const std::exception& e)
+		{
+			CROW_LOG_WARNING << "wrong refresh token"; 
+			return send_error("invalid_grant", 400);
+		}
+		
 		auto old_token = 
-			Token::get(body.at("refresh_token"), TokenType::refresh);
+			Token::get(body.at("refresh_token"), "refresh_token");
 
 		if (!old_token || old_token->client_id != client_id)
 		{
-			Token::destroy(body.at("refresh_token"), TokenType::refresh);
+			Token::destroy(body.at("refresh_token"), "refresh_token");
 			return send_error("invalid_grant", 400);
 		}
+
 		scopes = old_token->scopes;
 	}
-	
-	std::string access_token = gen_random(16);
-	std::string refresh_token = gen_random(16);
+	const auto now = std::chrono::system_clock::now();
+	const auto exp = now + std::chrono::days(10);
+    std::ifstream private_key(WORKDIR + "/key.pem");
+    std::stringstream buffer;
+    
+    buffer << private_key.rdbuf();
+    std::string prk{buffer.str()};
+    buffer.clear();
+    
+    using namespace std::literals; 
+    
+    auto access_token = jwt::create().
+		set_type("JWT").
+		set_algorithm("RS256").
+		set_issuer("http://localhost:9001/").
+		set_audience("http://localhost:9002/").
+		set_id("authserver").
+		sign(jwt::algorithm::rs256("", prk, "", ""));
 
-	Token acs_token(access_token, client_id, scopes, TokenType::access);
-	std::shared_ptr<std::string> exp = acs_token.create();
-	Token rfr_token(refresh_token, client_id, scopes, TokenType::refresh);
+	auto refresh_token = jwt::create().
+		set_type("JWT").
+		set_algorithm("RS256").
+		sign(jwt::algorithm::rs256("", prk, "", ""));
+	
+	const std::time_t expire = std::chrono::system_clock::to_time_t(exp);
+	Token::create(access_token, client_id, expire, scopes);
+	Token::create(refresh_token, client_id, 0, scopes);
+	
 	json res_resp = { 
 		{"access_token", access_token}, 
 		{"token_type", "Bearer"},
-		{"access_token expire", *exp },
+		{"access_token expire", std::format("{:%Y%m%d%H%M}", exp)},
 		{"refresh_token", refresh_token },
 		{ "scope", get_scopes(scopes) } 
 	};
+	
 	resp.code = 200;
 	resp.body = res_resp.dump();
+	return resp;
+}
+
+
+crow::response public_key::operator()(const crow::request& req) const
+{
+	crow::response resp;
+	json body, jresp;
+	try
+	{
+		body = json::parse(req.body);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		resp.code = 400;
+		return resp;
+	}
+	
+	if (!body.contains("resource") || 
+		crow::utility::base64decode(body["resource"]) != resource.resource_id)
+	{
+		resp.code = 400;
+		return resp;
+	}
+
+	std::ifstream public_key(WORKDIR + "/public.pem");
+    std::stringstream buffer;
+	buffer << public_key.rdbuf();
+    std::string pbk{buffer.str()};
+
+	jresp["public_key"] = std::move(pbk);
+	resp.code = 200;
+	resp.body = jresp.dump();
+	return resp;
+}
+
+
+crow::response revoke_handler::operator()(const crow::request& req) const
+{
+	crow::response resp;
+	std::string client_id, client_secret;
+	
+	auto auth_it = req.headers.find("authorization");
+    if (auth_it != req.headers.end())
+	{
+		std::string auth = auth_it->second;
+		std::vector<std::string> client_credentials = 
+			decode_client_credentials(auth);
+		if (client_credentials.empty())
+			return send_error("invalid_client", 401);
+		client_id = client_credentials.at(0);
+		client_secret = client_credentials.at(1);
+	}
+	
+	auto body = parse_form_data(req.body);
+	
+	if(body.contains("client_id"))
+	{
+		if (!client_id.empty())
+			return send_error("invalid_client", 401);
+		client_id = body["client_id"];
+		client_secret = body["client_secret"];
+	}
+	
+	auto client = Client::get(client_id);
+	if (!client || client->client_secret != client_secret) 
+		return send_error("invalid_client", 401);
+	
+	std::string token{body["token"]}, type{body["type"]};
+	std::shared_ptr<Token> token_inst = Token::get(token, body["type"]);
+	
+	if (token_inst || token_inst->client_id == client_id)
+	{
+		if (type == "access_token")
+			Token::destroy(client_id, type);
+		else
+			Token::destroy_all(client_id);
+	}
+	resp.code = 204;
 	return resp;
 }

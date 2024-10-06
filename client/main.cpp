@@ -25,8 +25,12 @@ int main()
         crow::HTTPMethod::GET)(authorize(cl, s));
     CROW_ROUTE(app, "/callback").methods(
         crow::HTTPMethod::POST)(callback(cl, s));
-     CROW_ROUTE(app, "/fetch_resource").methods(
+    CROW_ROUTE(app, "/fetch_resource").methods(
         crow::HTTPMethod::GET)(fetch_resource(cl, s));
+    CROW_ROUTE(app, "/revoke_access").methods(
+        crow::HTTPMethod::POST)(revoke_handler(cl));
+    CROW_ROUTE(app, "/revoke_refresh").methods(
+        crow::HTTPMethod::POST)(revoke_refresh_handler(cl));
     app.port(9000).run();
     return 0;
 }

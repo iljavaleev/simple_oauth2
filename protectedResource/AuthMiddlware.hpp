@@ -6,10 +6,12 @@
 
 #include "crow.h"
 #include <nlohmann/json.hpp>
+#include <jwt-cpp/jwt.h>
 #include "DB.hpp"
-
+#include "Utils.hpp"
 
 using json = nlohmann::json;
+extern ProtectedResource resource;
 
 
 struct AuthMW: crow::ILocalMiddleware
@@ -27,6 +29,7 @@ struct AuthMW: crow::ILocalMiddleware
         {   
             res.code = 403;
             res.end();
+            return;
         }
         std::string authorization = auth->second;
         std::string token;
@@ -52,46 +55,66 @@ struct AuthMW: crow::ILocalMiddleware
                     token = std::string(t);
             }
         }
-
-        auto token_inst = DB::get(token);
-
-        json j_error;
-        if(!token_inst)
+        
+        if (token.empty())
         {
-            res.code = 401;
-            j_error  = {"error", "no such access token exists"};
-            res.body = j_error.dump();
+            send_error(res, "no token privided", 401);
             res.end();
             return;
         }
-        const long exp = std::stoll(token_inst->expire);
+
+        json j_error;
+        std::string pk = get_public_key(resource);
+        if (pk.empty())
+        {
+            send_error(res, "validation error", 500);
+            res.end();
+            return;
+        }  
+        try
+        {
+           get_verifier(pk).verify(jwt::decode(token));
+        }
+        catch(const std::exception& e)
+        {
+            CROW_LOG_WARNING << "wrong token "; 
+            send_error(res, "no such access token exists", 401);
+            res.end();
+            return;
+        }
+        
+        auto token_inst = DB::get(token);
+
+        if(!token_inst)
+        {   
+            send_error(res, "no such access token exists", 401);
+            res.end();
+            return; 
+        }
+            
+        const long exp = token_inst->expire;
         const std::chrono::time_point now{std::chrono::system_clock::now()};
         const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
         
         if (exp - t_c < 0)
-        {
-            res.code = 401;
-            j_error  = {"error", "аccess token has expired"};
-            res.body = j_error.dump();
+        {   
+            send_error(res, "аccess token has expired", 401);
             res.end();
-            return;
+            return; 
         }
-
+            
         std::unordered_set<std::string> possible_scopes{"foo", "bar"};
-        for (const auto& s: token_inst->scope)
-        {
+        
+        for (const auto& s: token_inst->scopes)
             if (!possible_scopes.contains(s))
             {
-                 res.code = 401;
-                j_error  = {"error", "no such scope exists"};
-                res.body = j_error.dump();
+                send_error(res, "no such scope exists", 401);
                 res.end();
                 return;
             }
-        }
-
+                
         ctx.token = token_inst->token;
-        ctx.scope = token_inst->scope;
+        ctx.scope = token_inst->scopes;
     }
 
     void after_handle(crow::request& req, crow::response& res, context& ctx){}

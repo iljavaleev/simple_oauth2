@@ -28,5 +28,6 @@ std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);
 std::string url_decode(const std::string& encoded);
 std::string url_encode(const std::string& decoded);
+unsigned int revoke_token(Client& client, std::string&& type);
 
 #endif

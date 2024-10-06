@@ -125,6 +125,15 @@ struct Client
 };
 
 
+struct ProtectedResource
+{
+    std::string resource_id;
+    std::string resource_uri;
+    ProtectedResource(const std::string& id, const std::string& uri):
+        resource_id(id), resource_uri(uri){}
+};
+
+
 struct Code
 {
     std::string code;
@@ -142,43 +151,35 @@ struct Code
 };
 
 
-enum class TokenType { access, refresh };
-
-
 struct Token
 {
     std::string token;
     std::string client_id;
-    std::string expire; 
+    time_t expire; 
     std::unordered_set<std::string> scopes;
-    TokenType type;
     Token(
         const std::string& _token, 
         const std::string& _client_id,
-        const std::string& _expire,
-        const std::unordered_set<std::string> _scopes,
-        TokenType _type):
+        time_t _expire,
+        const std::unordered_set<std::string> _scopes):
     token(_token), 
     client_id(_client_id), 
     expire(_expire), 
-    scopes(_scopes), 
-    type(_type){}
-
-    Token(
-        const std::string& _token, 
-        const std::string& _client_id,
-        const std::unordered_set<std::string> _scopes,
-        TokenType _type):
-    token(_token), 
-    client_id(_client_id),  
-    scopes(_scopes), 
-    type(_type){}
+    scopes(_scopes){}
+ 
+    void create();
     
-    std::shared_ptr<std::string> create();
-    static std::shared_ptr<Token> get(const std::string& token, TokenType type);
-    static bool destroy(const std::string& client_id, TokenType type);
+    static void create(
+        const std::string& token,
+        const std::string& client_id, 
+        std::time_t exp,
+        std::unordered_set<std::string> scopes
+    );
+    
+    static std::shared_ptr<Token> get(const std::string& token, 
+        const std::string& type);
+    static bool destroy(const std::string& client_id, const std::string& type);
     static bool destroy_all(const std::string& client_id);
 };
-
 
 #endif

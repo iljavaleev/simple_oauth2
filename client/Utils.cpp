@@ -3,12 +3,16 @@
 
 #include <iostream>
 #include <sstream>
+#include <format>
 
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>
 #include "DB.hpp"
 
+
 using json = nlohmann::json;
+const std::string SERVER_URI = std::format(
+    "{}:{}", std::getenv("SERVER"), std::getenv("SERVER_PORT"));
 
 
 std::string gen_random(const int len) {
@@ -95,7 +99,7 @@ bool refresh_token(
     bool ret{false};
 
     cpr::Response token_response = cpr::Post(
-        cpr::Url{uri},
+        cpr::Url{SERVER_URI + "/token"},
         cpr::Header{
             {"Content-Type", "application/x-www-form-urlencoded"}, 
             {"Authorization", "Basic " + 
@@ -112,11 +116,33 @@ bool refresh_token(
         client.access_token = response["access_token"];
         if(response.contains("refresh_token"))
             client.refresh_token = response["refresh_token"];
-        client.scopes = get_scopes(response["scope"].dump());
+        client.scopes = get_scopes(
+            response["scope"].template get<std::string>());
         ret = true;
     }    
     return ret;
 }
+
+
+unsigned int revoke_token(
+    Client& client, 
+    std::string&& type
+)
+{   
+    std::string token = type == "access_token" ? 
+        client.access_token : client.refresh_token;
+    cpr::Response revoke_response = cpr::Post(
+        cpr::Url{SERVER_URI + "/revoke"},
+        cpr::Header{
+            {"Content-Type", "application/x-www-form-urlencoded"}, 
+            {"Authorization", "Basic " + 
+            encode_client_credentials(client.client_id, client.client_secret)}},
+        cpr::Payload{{"token", token}, {"type", type}}
+    );
+    
+   return revoke_response.status_code;
+}
+
 
 json get_answer(const Client& client, const std::string& uri)
 {
@@ -129,8 +155,10 @@ json get_answer(const Client& client, const std::string& uri)
         response = json::parse(r.text);
     else
         response["error"] = r.status_code;
+        
     return response;
 }
+
 
 std::unordered_set<std::string> get_scopes(const std::string& scopes)
 {
@@ -142,6 +170,7 @@ std::unordered_set<std::string> get_scopes(const std::string& scopes)
     return res;
 }
 
+
 std::string get_scopes(const std::unordered_set<std::string>& scopes)
 {
     std::ostringstream ss;
@@ -151,6 +180,7 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
     res.pop_back();
     return res;
 }
+
 
 std::string url_encode(const std::string& decoded)
 {

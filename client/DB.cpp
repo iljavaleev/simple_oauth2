@@ -93,15 +93,17 @@ bool Client::destroy(const std::string& client_id)
 }
 
 
-std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
+std::shared_ptr<Token> Token::get(
+    const std::string& token,
+    std::string&& type
+    )
 {
     
-    std::string token_type{"access_token"};
-    if (type == TokenType::refresh)
-        token_type = "refresh_token";
-    
+    std::size_t hash_token = std::hash<std::string>{}(token);
+    std::string token_type(std::move(type));
+
     auto doc = db->get_token_collection().
-        find_one(make_document(kvp(token_type, token)));
+        find_one(make_document(kvp(token_type, std::to_string(hash_token))));
     if (!doc)
         return std::shared_ptr<Token>();
     std::unordered_set<std::string> scopes;
@@ -110,14 +112,12 @@ std::shared_ptr<Token> Token::get(const std::string& token, TokenType type)
     for (bsoncxx::array::element ele : subarr)
         scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
     
+    
     return std::make_shared<Token>(
         bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
         bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
-        type == TokenType::access ? 
-            bsoncxx::string::to_string(
-                doc->view()["expire"].get_string().value) : "",
-        scopes,
-        static_cast<TokenType>(doc->view()[token_type].get_int32().value)
+        doc->view()["expire"].get_int64(),
+        scopes
     );
 }
 
@@ -130,14 +130,13 @@ bool Token::destroy_all(const std::string& client_id)
 }
 
 
-bool Token::destroy(const std::string& client_id, TokenType type)
+bool Token::destroy(const std::string& client_id, const std::string& type)
 {   
-    std::string token_type{"access_token"};
-    if (type == TokenType::refresh)
-        token_type = "refresh_token";
+    std::string token_type{type};
     auto res = db->get_token_collection().delete_one(
         make_document(
             kvp("client_id", client_id), 
-            kvp(token_type, true)));
+            kvp(token_type, make_document(kvp("$exists", true)))));
     return res->deleted_count() != 0;
 }
+

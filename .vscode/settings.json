@@ -65,6 +65,7 @@
         "forward_list": "cpp",
         "memory": "cpp",
         "print": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "set": "cpp"
     }
 }

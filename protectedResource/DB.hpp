@@ -21,19 +21,29 @@ using bsoncxx::builder::basic::make_document;
 inline mongocxx::instance instance{};
 
 
+struct ProtectedResource
+{
+    std::string resource_id;
+    std::string resource_uri;
+    ProtectedResource(const std::string& id, const std::string& uri):
+        resource_id(id), resource_uri(uri){}
+};
+
 struct Token
 {
     std::string token;
     std::string client_id;
-    std::string expire; 
-    std::unordered_set<std::string> scope;
+    time_t expire; 
+    std::unordered_set<std::string> scopes;
     Token(
         const std::string& _token, 
         const std::string& _client_id,
-        const std::string& _expire,
-        const std::unordered_set<std::string>& _scope
-    ):
-    token(_token), client_id(_client_id), expire(_expire), scope(_scope){}
+        time_t _expire,
+        const std::unordered_set<std::string> _scopes):
+    token(_token), 
+    client_id(_client_id), 
+    expire(_expire), 
+    scopes(_scopes){}
 };
 
 

@@ -121,27 +121,25 @@ struct Client
 };
 
 
-enum class TokenType { access, refresh };
-
-
 struct Token
 {
     std::string token;
     std::string client_id;
-    std::string expire; 
+    time_t expire; 
     std::unordered_set<std::string> scopes;
-    TokenType type;
     Token(
         const std::string& _token, 
         const std::string& _client_id,
-        const std::string& expire,
-        const std::unordered_set<std::string>& _scopes,
-        TokenType _type):
-    token(_token), client_id(_client_id), scopes(_scopes), type(_type){}
-
-    static std::shared_ptr<Token> get(const std::string& token, TokenType type);
-    
-    static bool destroy(const std::string& client_id, TokenType type);
+        time_t _expire,
+        const std::unordered_set<std::string> _scopes):
+    token(_token), 
+    client_id(_client_id), 
+    expire(_expire), 
+    scopes(_scopes){}
+  
+    static std::shared_ptr<Token> get(const std::string& token, 
+        std::string&& type);
+    static bool destroy(const std::string& client_id, const std::string& type);
     static bool destroy_all(const std::string& client_id);
 };
 

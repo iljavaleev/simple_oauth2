@@ -10,19 +10,19 @@
 
 
 struct idx{
-    Client client;
-    idx(const Client& _client): client(_client){}
+    Client& client;
+    idx(Client& _client): client(_client){}
     
     crow::mustache::rendered_template operator()(
         const crow::request& req) const;
 };
 
 struct authorize{
-    Client client;
-    Server server;
+    Client& client;
+    Server& server;
     authorize(
-        const Client& _client, 
-        const Server& _server): 
+        Client& _client, 
+        Server& _server): 
         client(_client), server(_server){}
     
     crow::response operator()(
@@ -49,5 +49,16 @@ struct fetch_resource{
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
 
+struct revoke_handler{
+    Client& client;
+    revoke_handler(Client& _client): client(_client){}
+    crow::mustache::rendered_template operator()(const crow::request&) const;
+};
+
+struct revoke_refresh_handler{
+    Client& client;
+    revoke_refresh_handler(Client& _client): client(_client){}
+    crow::mustache::rendered_template operator()(const crow::request&) const;
+};
 
 #endif

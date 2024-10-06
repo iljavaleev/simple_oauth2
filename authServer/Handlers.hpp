@@ -25,4 +25,15 @@ struct token
 {
     crow::response operator()(const crow::request& req) const;
 };
+
+struct public_key
+{
+   crow::response operator()(const crow::request& req) const;
+};
+
+struct revoke_handler
+{
+   crow::response operator()(const crow::request& req) const;
+};
+
 #endif

@@ -6,11 +6,19 @@
 #include <curl/curl.h>
 #include <unordered_set>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 #include "crow.h"
 #include <nlohmann/json.hpp>
+#include <jwt-cpp/jwt.h>
+
 
 using nlohmann::json;
+
+
+const std::string WORKDIR = std::getenv("WORKDIR");
+
 
 std::string gen_random(const int len) {
     static const char alphanum[] =
@@ -149,4 +157,18 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
     std::string res = ss.str();
     res.pop_back();
     return res;
+}
+
+jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier()
+{
+    std::ifstream public_key(WORKDIR + "/public.pem");
+    std::stringstream buffer;
+
+    buffer << public_key.rdbuf();
+    std::string pbk{buffer.str()};
+    buffer.clear();
+
+    return jwt::verify().with_type("JWT").
+            allow_algorithm(
+        jwt::algorithm::rs256(pbk, "", "", ""));
 }

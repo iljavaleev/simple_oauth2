@@ -27,18 +27,28 @@
 
     <div class="container">
 
-      <div class="jumbotron">
+      <div class="jumbotron jumbotron-fluid">
 		  <p>Access token value: <span class="label label-danger">
         {{ access_token }}
       </span></p>
 		  <p>Scope value: <span class="label label-danger">
+        {% if access_token == "NONE" %}
+        NONE
+        {% else %}
         {{ scope }}
+        {% endif %}
       </span></p>
 		  <p>Refresh token value: <span class="label label-danger">
         {{ refresh_token }}
       </span></p>
 		  <a class="btn btn-default" href="/authorize">Get OAuth Token</a> 
-		  <a class="btn btn-default" href="/fetch_resource">Get Protected Resource</a> 
+		  <a class="btn btn-default" href="/fetch_resource">Get Protected Resource</a>
+      <form action="/revoke_access" class="form" method="POST">
+        <input type="submit" class="btn btn-default" value="Revoke Access OAuth Token" />
+      </form>
+      <form action="/revoke_refresh" class="form" method="POST">
+        <input type="submit" class="btn btn-default" value="Revoke Refresh OAuth Token" />
+      </form>
       </div>
 
     </div>
