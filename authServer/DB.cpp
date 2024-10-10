@@ -2,7 +2,6 @@
 
 #include <unordered_set>
 #include <memory>
-#include <chrono>
 #include <ctime>
 #include <iomanip>
 
@@ -18,6 +17,9 @@ using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::sub_array;
 
 std::unique_ptr<DB> db = std::make_unique<DB>();
+
+const std::unordered_set<std::string> 
+Client::token_endpoint_auth_methods{"secret_basic", "secret_post", "none"};
 
 
 void Client::create()
@@ -62,27 +64,61 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
 {
     auto client_value = db->get_client_collection().
         find_one(make_document(kvp("client_id", client_id)));
+    
     if (!client_value)
-        return nullptr;
-
+        return std::shared_ptr<Client>();
+    std::shared_ptr<Client> client_res = std::make_shared<Client>();
+    
     bsoncxx::document::view client = client_value->view();
-    std::vector<std::string> uris;
-    std::unordered_set<std::string> scopes;
+    
     bsoncxx::array::view subarr{client["redirect_uris"].get_array().value};
     for (bsoncxx::array::element ele : subarr)
-        uris.push_back(bsoncxx::string::to_string(ele.get_string().value));           
+        client_res->redirect_uris.push_back(
+            bsoncxx::string::to_string(ele.get_string().value)
+        );           
     
     subarr = client["scope"].get_array().value;
     for (bsoncxx::array::element ele : subarr)
-        scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
+        client_res->scopes.insert(
+            bsoncxx::string::to_string(ele.get_string().value)
+        );
 
-    return std::make_shared<Client>(
-        bsoncxx::string::to_string(client["client_id"].get_string().value),
-        bsoncxx::string::to_string(
-            client["client_secret"].get_string().value),
-        uris,
-        scopes
-    );
+    subarr = client["grant_types"].get_array().value;
+    for (bsoncxx::array::element ele : subarr)
+        client_res->grant_types.insert(
+            bsoncxx::string::to_string(ele.get_string().value)
+        );
+    
+    subarr = client["response_types"].get_array().value;
+    for (bsoncxx::array::element ele : subarr)
+        client_res->response_types.insert(
+            bsoncxx::string::to_string(ele.get_string().value)
+        );
+    
+    client_res->client_id = bsoncxx::string::to_string(
+        client["client_id"].get_string().value);
+
+    client_res->token_endpoint_auth_method = bsoncxx::string::to_string(
+        client["token_endpoint_auth_method"].get_string().value);
+    
+    client_res->client_id_created_at = 
+        client["client_id_created_at"].get_int64();
+    client_res->client_id_expires_at = 
+        client["client_id_expires_at"].get_int64();
+    
+    if(client["client_secret"])
+        client_res->client_secret = bsoncxx::string::to_string(
+            client["client_secret"].get_string().value);
+
+    if (client["client_name"])
+        client_res->client_name =  bsoncxx::string::to_string(
+            client["client_name"].get_string().value);
+
+    if (client["client_uri"])
+        client_res->client_name =  bsoncxx::string::to_string(
+            client["client_uri"].get_string().value);
+    
+    return client_res;
 }
 
 

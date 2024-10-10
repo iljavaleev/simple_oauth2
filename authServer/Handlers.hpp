@@ -36,4 +36,9 @@ struct revoke_handler
    crow::response operator()(const crow::request& req) const;
 };
 
+struct register
+{
+   crow::response operator()(const crow::request& req) const;
+};
+
 #endif

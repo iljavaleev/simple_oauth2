@@ -98,26 +98,17 @@ struct Client
     std::string client_secret;
     std::vector<std::string> redirect_uris;
     std::unordered_set<std::string> scopes;
-    Client(
-        const std::string& _id,
-        const std::string& _secret,
-        std::vector<std::string> _redirect_uris, 
-        std::unordered_set<std::string> _scopes):
-        client_id(_id), 
-        client_secret(_secret), 
-        redirect_uris(_redirect_uris),
-        scopes(_scopes){}
-    Client(
-        const std::string& _id,
-        const std::string& _secret,
-        std::vector<std::string> _redirect_uris, 
-        std::string _scopes):
-        client_id(_id), 
-        client_secret(_secret), 
-        redirect_uris(_redirect_uris)
-        {   
-            scopes = std::unordered_set<std::string>(get_scopes(_scopes));
-        }
+    
+    time_t client_id_created_at;
+    time_t client_id_expires_at;
+    std::string client_name;
+    std::string client_uri;
+    std::unordered_set<std::string> grant_types;
+    std::unordered_set<std::string> response_types;
+    std::string token_endpoint_auth_method;
+    
+    const static std::unordered_set<std::string> token_endpoint_auth_methods;
+
     void create();
     static std::shared_ptr<Client> get(const std::string& client_id); 
     static bool destroy(const std::string& client_id);
