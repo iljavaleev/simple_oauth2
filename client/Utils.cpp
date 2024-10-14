@@ -124,6 +124,72 @@ bool refresh_token(
 }
 
 
+void register_client(Client& client)
+{   
+    json j = {
+        {"client_name", "Test name"},
+        {"client_uri", "http://localhost:9000/"},
+        {"redirect_uris", {"http://localhost:9000/callback"}},
+        {"grant_types", {"authorization_code"}},
+        {"response_types", {"code"}},
+        {"scope", "foo bar"},
+        {"token_endpoint_auth_method", "secret_basic"}
+    };
+    
+    cpr::Response r = cpr::Post(
+        cpr::Url{SERVER_URI + "/register"}, 
+        cpr::Header{
+            {"Content-Type", "application/json"}, 
+            {"Accept", "application/json"}
+        },
+        cpr::Body{j.dump()});
+    
+    
+    if (r.status_code >= 200 && r.status_code < 300)
+    {   
+        json response;
+        try
+        {
+            response = json::parse(r.text);
+        }
+        catch(const std::exception& e)
+        {
+            CROW_LOG_WARNING << "error parsing register response";
+        }
+        CROW_LOG_WARNING << response.dump();
+        client.client_id = response["client_id"];
+        if (response.contains("client_secret"))
+            client.client_secret = response["client_secret"];
+        client.token_endpoint_auth_method = 
+            response["token_endpoint_auth_method"];
+        client.client_id_created_at = response["client_id_created_at"];
+        client.client_id_expires_at = response["client_id_expires_at"];
+        client.grant_types = response["grant_types"].
+            template get<std::unordered_set<std::string>>();
+        client.response_types = response["response_types"].
+            template get<std::unordered_set<std::string>>();
+        client.redirect_uris = response["redirect_uris"].
+            template get<std::vector<std::string>>();
+        if (response.contains("client_name"))
+		    client.client_name  = response["client_name"];
+        if (response.contains("scope"))
+        {
+            client.scopes = 
+                get_scopes(response["scope"].template get<std::string>());
+        }
+        
+        try
+        {
+            client.save();
+        }
+        catch(const std::exception& e)
+        {
+            CROW_LOG_WARNING << "error saving client";
+        }
+    }
+}
+
+
 unsigned int revoke_token(
     Client& client, 
     std::string&& type

@@ -1,11 +1,14 @@
 
 #include "Utils.hpp"
 
+#include <format>
+#include <sstream>
+
 #include <cpr/cpr.h>
 #include "crow.h"
 #include <nlohmann/json.hpp>
 #include "DB.hpp"
-#include <format>
+
 
 using json = nlohmann::json;
 const std::string SERVER_URI = std::format(
@@ -48,4 +51,24 @@ void send_error(crow::response& resp, std::string&& message, int code)
     resp.code = code;
     json j = {{ "error", message }};
     resp.body = j.dump();
+}
+
+json parse_token_info(const std::string& token)
+{
+    json result;
+    auto decoded = jwt::decode(token);
+
+	for (auto e : decoded.get_payload_json())
+		result[e.first] = e.second.to_str();
+    return result;
+}
+
+std::unordered_set<std::string> get_scopes(const std::string& scopes)
+{
+    std::unordered_set<std::string> res;
+    std::istringstream iss(scopes);
+    std::string s;
+    while (getline(iss, s, ' ')) 
+        res.insert(s);
+    return res;
 }

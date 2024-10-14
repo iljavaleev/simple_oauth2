@@ -22,24 +22,51 @@ const std::unordered_set<std::string>
 Client::token_endpoint_auth_methods{"secret_basic", "secret_post", "none"};
 
 
-void Client::create()
+void Client::save()
 {   
     mongocxx::options::update options;
     options.upsert(true);
-
     auto cl = bsoncxx::builder::basic::document{};
-    cl.append(kvp("client_id", client_id));
+    cl.append(kvp("client_uri", client_uri));
     
     auto doc = bsoncxx::builder::basic::document{};
+    doc.append(kvp("client_uri", client_uri));
     doc.append(kvp("client_id", client_id));
     doc.append(kvp("client_secret", client_secret));
-    doc.append(kvp("redirect_uris", [this](sub_array child) {
+    
+    doc.append(kvp("client_id_created_at", int64_t(client_id_created_at)));
+    doc.append(kvp("client_id_expires_at", int64_t(client_id_expires_at)));
+    doc.append(kvp("token_endpoint_auth_method", token_endpoint_auth_method));
+
+    if (!client_name.empty())   
+        doc.append(kvp("client_name", client_name));
+    
+    doc.append(kvp("redirect_uris", [this](sub_array child) 
+    {
         for (const auto& uri : redirect_uris) 
         {
             child.append(uri);
-        }}));
+        }
+    }));
         
-    doc.append(kvp("scope", [this](sub_array child) {
+    doc.append(kvp("grant_types", [this](sub_array child) 
+    {
+        for (const auto& s : grant_types) 
+        {
+            child.append(s);
+        }
+    }));
+
+    doc.append(kvp("response_types", [this](sub_array child) 
+    {
+        for (const auto& s : response_types) 
+        {
+            child.append(s);
+        }
+    }));
+
+    doc.append(kvp("scope", [this](sub_array child) 
+    {
         for (const auto& s : scopes) 
         {
             child.append(s);
@@ -95,6 +122,9 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
             bsoncxx::string::to_string(ele.get_string().value)
         );
     
+    client_res->client_uri = bsoncxx::string::to_string(
+        client["client_uri"].get_string().value);
+
     client_res->client_id = bsoncxx::string::to_string(
         client["client_id"].get_string().value);
 
@@ -113,41 +143,69 @@ std::shared_ptr<Client> Client::get(const std::string& client_id)
     if (client["client_name"])
         client_res->client_name =  bsoncxx::string::to_string(
             client["client_name"].get_string().value);
-
-    if (client["client_uri"])
-        client_res->client_name =  bsoncxx::string::to_string(
-            client["client_uri"].get_string().value);
     
     return client_res;
 }
 
 
- std::vector<std::shared_ptr<Client>> Client::get_all()
- {
+std::vector<std::shared_ptr<Client>> Client::get_all()
+{
     std::vector<std::shared_ptr<Client>> res;
     auto clients_doc = db->get_client_collection().find({});
     for (auto client: clients_doc)
     {
-        std::vector<std::string> uris;
-        std::unordered_set<std::string> scopes;
+        std::shared_ptr<Client> client_res = std::make_shared<Client>();
+        
         bsoncxx::array::view subarr{client["redirect_uris"].get_array().value};
         for (bsoncxx::array::element ele : subarr)
-            uris.push_back(bsoncxx::string::to_string(ele.get_string().value));           
+            client_res->redirect_uris.push_back(
+                bsoncxx::string::to_string(ele.get_string().value)
+                );           
         
         subarr = client["scope"].get_array().value;
         for (bsoncxx::array::element ele : subarr)
-            scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
+            client_res->scopes.insert(
+                bsoncxx::string::to_string(ele.get_string().value)
+            );
+        
+        subarr = client["grant_types"].get_array().value;
+        for (bsoncxx::array::element ele : subarr)
+            client_res->grant_types.insert(
+                bsoncxx::string::to_string(ele.get_string().value)
+            );
+    
+        subarr = client["response_types"].get_array().value;
+        for (bsoncxx::array::element ele : subarr)
+            client_res->response_types.insert(
+                bsoncxx::string::to_string(ele.get_string().value)
+            );
+        
+        client_res->client_id_created_at = 
+            client["client_id_created_at"].get_int64();
+        client_res->client_id_expires_at = 
+            client["client_id_expires_at"].get_int64();
 
-        res.push_back(std::make_shared<Client>(
-            bsoncxx::string::to_string(client["client_id"].get_string().value),
-            bsoncxx::string::to_string(
-                client["client_secret"].get_string().value),
-            uris,
-            scopes
-        ));
+        client_res->client_id = bsoncxx::string::to_string(
+            client["client_id"].get_string().value);
+        client_res->token_endpoint_auth_method = bsoncxx::string::to_string(
+            client["token_endpoint_auth_method"].get_string().value);
+        client_res->client_uri = bsoncxx::string::to_string(
+            client["client_uri"].get_string().value);
+
+        if(client["client_secret"])
+            client_res->client_secret = bsoncxx::string::to_string(
+                client["client_secret"].get_string().value);
+
+        if (client["client_name"])
+            client_res->client_name =  bsoncxx::string::to_string(
+                client["client_name"].get_string().value);
+
+        
+        res.push_back(client_res);
     }
     return res;
- }
+}
+
 
 bool Client::destroy(const std::string& client_id)
 {   
@@ -281,6 +339,7 @@ void Token::create()
     db->get_token_collection().update_one(
         prev.view(), outer.view(), options);
 }
+
 
 void Token::create(
     const std::string& token,

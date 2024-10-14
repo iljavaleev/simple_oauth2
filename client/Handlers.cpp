@@ -16,8 +16,6 @@ inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 inja::Template data_temp = env.parse_template(WORKDIR + "/files/data.html");
 inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 
-std::string state{};
-
 
 const std::string protected_resource = std::format(
     "http://{}:{}/resource", 
@@ -34,7 +32,6 @@ const std::string token_endpoint = std::format(
 crow::mustache::rendered_template idx::operator()(
     const crow::request& req) const
 {
-    
     json render_json;
     render_json["access_token"] = !client.access_token.empty() ? 
         client.access_token : "NONE";
@@ -51,17 +48,33 @@ crow::mustache::rendered_template idx::operator()(
 
 crow::response authorize::operator()(const crow::request& req) const
 {
-    srand((unsigned)time(NULL) * getpid());
-    state = gen_random(12);
+    crow::response res;
+    json jres;
+    if (client.client_id.empty())
+    {
+        register_client(client);
+        if (client.client_id.empty())
+        {
+            jres["error"] = "Unable to register client";
+            res.body = jres.dump();
+            res.code = 400;
+            return res;
+        }
+    }
+    
+    auto state = State::create(client);
+
     json options = {
         {"response_type", "code"},
-        {"scope", get_scopes(client.scopes)},
+        {"client_uri", Client::client_uri},
+        {"scope", !client.scopes.empty() ? 
+            get_scopes(client.scopes) : "foo bar"},
 	    {"client_id", client.client_id},
 		{"redirect_uri", client.redirect_uris.at(0)},
-		{"state", state}
+		{"state", state->state}
     };
+    CROW_LOG_WARNING << options.dump();
     std::string uri = build_url(server.authorization_endpoint, options);
-    crow::response res;
     res.redirect(uri);
     return res;
 }
@@ -72,7 +85,9 @@ crow::mustache::rendered_template callback::operator()(
 {
     
     json render_json;
-    std::string res;
+    std::string res, state;
+    state = State::get(client)->state;
+    
     if (req.url_params.get("error"))
     {
         res = env.render(error_temp, {{"error", req.url_params.get("error")}});
@@ -95,7 +110,8 @@ crow::mustache::rendered_template callback::operator()(
         return page.render();
     }
     bool try_get = get_token(
-        client, token_endpoint, std::string(code));
+        client, token_endpoint, std::string(code)
+    );
     
     inja::Template templ;
 	if (!try_get)
@@ -111,6 +127,7 @@ crow::mustache::rendered_template callback::operator()(
                 client.refresh_token : "None"},
             {"scope", get_scopes(client.scopes)}
         };
+        client.save();
         templ = index_temp;
     }
 	res = env.render(templ, render_json);
@@ -129,20 +146,21 @@ crow::mustache::rendered_template fetch_resource::operator()(
     if (response.contains("error") && response["error"] < 500)
     {  
         client.access_token.clear();
-        Token::destroy(client.client_id, "access_token");
+        CROW_LOG_WARNING << "access token problem";
         if(refresh_token(client, server.token_endpoint))
         {
             response = get_answer(client, protected_resource);
             if(response.contains("error") && response["error"] < 500)
             {
                 client.refresh_token.clear();                
-                Token::destroy_all(client.client_id);
+                client.save();
             }
         }    
     }
 
     if (response.contains("error"))
     {   
+        CROW_LOG_WARNING << "refresh token problem";
         res = env.render(error_temp, {{"error", "Unable to fetch data."}});
         auto page = crow::mustache::compile(res);
         return page.render();
@@ -163,6 +181,7 @@ crow::mustache::rendered_template revoke_handler::operator()(
     {
         client.access_token.clear();
         client.scopes.clear();
+        client.save();
         json render_json;
         render_json["access_token"] = !client.access_token.empty() ? 
             client.access_token : "NONE";
@@ -190,6 +209,7 @@ crow::mustache::rendered_template revoke_refresh_handler::operator()(
     {
         client.access_token.clear();
         client.refresh_token.clear();
+        client.save();
         json render_json;
         render_json["access_token"] = !client.access_token.empty() ? 
             client.access_token : "NONE";

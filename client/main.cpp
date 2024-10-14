@@ -4,21 +4,16 @@
 #include "Handlers.hpp"
  
 
-Client cl(
-    "oauth-client-1", 
-    "oauth-client-secret-1",
-    {"http://localhost:9000/callback", "http://localhost:9000/fetch_resource"}, 
-    "foo bar"
-);
-
-
 Server s("http://localhost:9001/authorize", "http://localhost:9001/token");
 
 
 int main()
 {
     crow::SimpleApp app;
- 
+    Client cl;
+    std::shared_ptr<Client> cl_ptr = Client::get();
+    if (cl_ptr)
+        cl = *cl_ptr;
     CROW_ROUTE(app, "/").methods(
         crow::HTTPMethod::GET)(idx(cl));
     CROW_ROUTE(app, "/authorize").methods(

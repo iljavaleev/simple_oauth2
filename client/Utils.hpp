@@ -19,10 +19,8 @@ bool get_token(
     const std::string& uri, 
     const std::string& code
 );
-bool refresh_token(
-    Client& client, 
-    const std::string& uri
-);
+bool refresh_token(Client& client, const std::string& uri);
+void register_client(Client& client);
 json get_answer(const Client& client, const std::string& uri);
 std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);

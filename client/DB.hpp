@@ -30,21 +30,19 @@ class DB
     mongocxx::database db;
     mongocxx::collection client_collection;
     mongocxx::collection token_collection;
-    mongocxx::collection code_collection;
-    mongocxx::collection request_collection;
+    mongocxx::collection state_collection;
 public:
     DB(const std::string _db = "auth")
     {
         uri = mongocxx::uri(std::format("mongodb://{}:{}", 
-            std::getenv("MONGODB_HOST"),
-            std::getenv("MONGODB_PORT")
+            std::getenv("CLIENT_MONGODB_HOST"),
+            std::getenv("CLIENT_MONGODB_PORT")
         ));
         client = mongocxx::client(uri);
         db = client[_db]; 
         client_collection = db["client"];
         token_collection = db["server"];
-        code_collection = db["code"];
-        request_collection = db["request"];
+        state_collection = db["state"];
     }
     mongocxx::collection get_client_collection() const 
     { 
@@ -54,13 +52,9 @@ public:
     { 
         return token_collection; 
     }
-    mongocxx::collection get_code_collection() const 
+    mongocxx::collection get_state_collection() const 
     { 
-        return code_collection; 
-    }
-    mongocxx::collection get_request_collection() const 
-    { 
-        return request_collection; 
+        return state_collection; 
     }
 };
 
@@ -85,62 +79,40 @@ struct Server
 };
 
 
+struct State
+{
+    std::string state;
+    std::string client_id;
+
+    static std::shared_ptr<State> get(const Client& client);
+    static std::shared_ptr<State> create(const Client& client);
+};
+
+
 struct Client
 {
+    std::string access_token;
+    std::string refresh_token;
+    
     std::string client_id;
     std::string client_secret;
     std::vector<std::string> redirect_uris;
     std::unordered_set<std::string> scopes;
+    
+    time_t client_id_created_at;
+    time_t client_id_expires_at;
+    std::string client_name;
 
-    std::string access_token{};
-    std::string refresh_token{};
+    std::unordered_set<std::string> grant_types;
+    std::unordered_set<std::string> response_types;
+    std::string token_endpoint_auth_method;
+    
+    const static std::string client_uri;
+    const static std::unordered_set<std::string> token_endpoint_auth_methods;
 
-    Client(
-        const std::string& _id,
-        const std::string& _secret,
-        std::vector<std::string> _redirect_uris, 
-        std::unordered_set<std::string> _scopes):
-        client_id(_id), 
-        client_secret(_secret), 
-        redirect_uris(_redirect_uris),
-        scopes(_scopes){}
-    Client(
-        const std::string& _id,
-        const std::string& _secret,
-        std::vector<std::string> _redirect_uris, 
-        std::string _scopes):
-        client_id(_id), 
-        client_secret(_secret), 
-        redirect_uris(_redirect_uris)
-        {   
-            scopes = std::unordered_set<std::string>(get_scopes(_scopes));
-        }
-    void create();
-    static std::shared_ptr<Client> get(const std::string& client_id); 
+    void save();
+    static std::shared_ptr<Client> get(); 
     static bool destroy(const std::string& client_id);
-};
-
-
-struct Token
-{
-    std::string token;
-    std::string client_id;
-    time_t expire; 
-    std::unordered_set<std::string> scopes;
-    Token(
-        const std::string& _token, 
-        const std::string& _client_id,
-        time_t _expire,
-        const std::unordered_set<std::string> _scopes):
-    token(_token), 
-    client_id(_client_id), 
-    expire(_expire), 
-    scopes(_scopes){}
-  
-    static std::shared_ptr<Token> get(const std::string& token, 
-        std::string&& type);
-    static bool destroy(const std::string& client_id, const std::string& type);
-    static bool destroy_all(const std::string& client_id);
 };
 
 #endif

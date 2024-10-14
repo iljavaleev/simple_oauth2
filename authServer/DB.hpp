@@ -35,8 +35,8 @@ public:
     DB(const std::string _db = "auth")
     {
         uri = mongocxx::uri(std::format("mongodb://{}:{}", 
-            std::getenv("MONGODB_HOST"),
-            std::getenv("MONGODB_PORT")
+            std::getenv("AUTH_MONGODB_HOST"),
+            std::getenv("AUTH_MONGODB_PORT")
         ));
         client = mongocxx::client(uri);
         db = client[_db]; 
@@ -109,7 +109,7 @@ struct Client
     
     const static std::unordered_set<std::string> token_endpoint_auth_methods;
 
-    void create();
+    void save();
     static std::shared_ptr<Client> get(const std::string& client_id); 
     static bool destroy(const std::string& client_id);
     static std::vector<std::shared_ptr<Client>> get_all();

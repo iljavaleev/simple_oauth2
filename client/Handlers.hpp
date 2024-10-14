@@ -9,13 +9,13 @@
 #include "DB.hpp"
 
 
-struct idx{
+struct idx{ 
     Client& client;
-    idx(Client& _client): client(_client){}
-    
+    idx(Client&  _cl): client(_cl){} 
     crow::mustache::rendered_template operator()(
         const crow::request& req) const;
 };
+
 
 struct authorize{
     Client& client;
@@ -29,6 +29,7 @@ struct authorize{
         const crow::request& req) const;
 };
 
+
 struct callback{
     Client& client;
     Server& server;
@@ -38,6 +39,7 @@ struct callback{
         client(_client), server(_server){}
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
+
 
 struct fetch_resource{
     Client& client;
@@ -49,11 +51,13 @@ struct fetch_resource{
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
 
+
 struct revoke_handler{
     Client& client;
     revoke_handler(Client& _client): client(_client){}
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
+
 
 struct revoke_refresh_handler{
     Client& client;

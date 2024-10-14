@@ -8,6 +8,7 @@
 #include "crow.h"
 #include <jwt-cpp/jwt.h>
 
+
 std::string gen_random(const int len);
 std::string build_url(std::string base, nlohmann::json options);
 std::string encode_client_credentials(
@@ -21,4 +22,5 @@ std::string url_encode(const std::string& decoded);
 std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);
 jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier();
+
 #endif

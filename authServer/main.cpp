@@ -6,23 +6,8 @@
 #include "Handlers.hpp"    
 
 
-Client client(
-    "oauth-client-1", 
-    "oauth-client-secret-1", 
-    {"http://localhost:9000/callback"},
-    "foo bar"
-);
-
-ProtectedResource resource(
-    "resource_id",
-    "http://localhost:9002"
-);
-
-
 int main()
-{
-    client.create();
-    
+{ 
     crow::SimpleApp app;
     app.loglevel(crow::LogLevel::Warning);
     CROW_ROUTE(app, "/")
@@ -42,6 +27,10 @@ int main()
 
     CROW_ROUTE(app, "/revoke").methods(
         crow::HTTPMethod::POST)(revoke_handler());
+
+    CROW_ROUTE(app, "/register").methods(
+        crow::HTTPMethod::POST)(register_handler());
+    
     app.port(9001).run();
     return 0;
 }

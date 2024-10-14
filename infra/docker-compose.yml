@@ -1,12 +1,21 @@
 
 services:
 
-  mongodb:
+  mongodb_auth:
     image: mongo
-    container_name: mongo
+    container_name: mongo_auth
     env_file: "./.env"
     ports:
-      - ${MONGODB_PORT}:${MONGODB_PORT}
+      - ${AUTH_MONGODB_PORT}:${AUTH_MONGODB_PORT}
+    networks:
+      - services 
+
+  mongodb_client:
+    image: mongo
+    container_name: mongo_client
+    env_file: "./.env"
+    ports:
+      - ${CLIENT_MONGODB_PORT}:${CLIENT_MONGODB_PORT}
     networks:
       - services 
 
@@ -25,7 +34,7 @@ services:
     networks:
       - services 
     depends_on:
-      - mongodb
+      - mongodb_auth
 
   client:
     image: valeevilja/oauth2_client:v1
@@ -42,7 +51,7 @@ services:
     networks:
       - services 
     depends_on:
-      - mongodb
+      - mongodb_client
 
   resource:
     image: valeevilja/oauth2_resource:v1

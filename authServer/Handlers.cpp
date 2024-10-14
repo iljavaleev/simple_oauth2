@@ -25,7 +25,12 @@ inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 inja::Template appr_temp = env.parse_template(WORKDIR + "/files/approve.html");
 inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 
-extern ProtectedResource resource;
+
+ProtectedResource resource(
+    "resource_id",
+    "http://localhost:9002"
+);
+
 
 crow::mustache::rendered_template idx::operator()(
 	const crow::request& req) const
@@ -284,6 +289,7 @@ crow::response token::operator()(const crow::request& req) const
 
 		if (!old_token || old_token->client_id != client_id)
 		{
+			CROW_LOG_WARNING << "refresh token db problem"; 
 			Token::destroy(body.at("refresh_token"), "refresh_token");
 			return send_error("invalid_grant", 400);
 		}
@@ -300,21 +306,25 @@ crow::response token::operator()(const crow::request& req) const
     buffer.clear();
     
     using namespace std::literals; 
-    
-    auto access_token = jwt::create().
-		set_type("JWT").
-		set_algorithm("RS256").
-		set_issuer("http://localhost:9001/").
-		set_audience("http://localhost:9002/").
-		set_id("authserver").
-		sign(jwt::algorithm::rs256("", prk, "", ""));
+    const std::time_t expire = std::chrono::system_clock::to_time_t(exp);
+    auto access_token = jwt::create()
+		.set_type("JWT")
+		.set_algorithm("RS256")
+		.set_issuer("http://localhost:9001/")
+		.set_audience("http://localhost:9002/")
+		.set_payload_claim("expire", 
+			jwt::claim(std::to_string(expire)))
+		.set_payload_claim("scope", 
+			jwt::claim(std::string(get_scopes(scopes))))
+		.set_id("authserver")
+		.sign(jwt::algorithm::rs256("", prk, "", ""));
 
-	auto refresh_token = jwt::create().
-		set_type("JWT").
-		set_algorithm("RS256").
-		sign(jwt::algorithm::rs256("", prk, "", ""));
+	auto refresh_token = jwt::create()
+		.set_type("JWT")
+		.set_algorithm("RS256")
+		.sign(jwt::algorithm::rs256("", prk, "", ""));
 	
-	const std::time_t expire = std::chrono::system_clock::to_time_t(exp);
+	
 	Token::create(access_token, client_id, expire, scopes);
 	Token::create(refresh_token, client_id, 0, scopes);
 	
@@ -412,10 +422,10 @@ crow::response revoke_handler::operator()(const crow::request& req) const
 }
 
 
-crow::response register::operator()(const crow::request& req) const
+crow::response register_handler::operator()(const crow::request& req) const
 {
 	Client new_client;
-	json body, jresp;
+	json body;
 	crow::response resp;
 	try
 	{
@@ -423,12 +433,12 @@ crow::response register::operator()(const crow::request& req) const
 	}
 	catch(const std::exception& e)
 	{
-		CROW_LOG_WARNING << e;
+		CROW_LOG_WARNING << e.what();
 		resp.code = 400;
 		return resp;
 	}
-
-	if (body.contains["token_endpoint_auth_method"])
+	
+	if (body.contains("token_endpoint_auth_method"))
 	{
 		new_client.token_endpoint_auth_method = 
 			body["token_endpoint_auth_method"];
@@ -444,50 +454,54 @@ crow::response register::operator()(const crow::request& req) const
 	{
 		return send_error("invalid_client_metadata", 400);
 	}
-
-	std::unordered_set<std::string> gt = 
-		body.contains["grant_types"] ? body["grant_types"].
-			template get<std::unordered_set<std::string>>() : {};
-
-	std::unordered_set<std::string> rt = 
-		body.contains["response_types"] ? body["response_types"].
-			template get<std::unordered_set<std::string>>() : {};
-
-
-	if (body.contains["grant_types"] && body.contains["response_types"])
+	
+	std::unordered_set<std::string> gt, rt;
+	if (body.contains("grant_types"))
 	{
-		new_client.grant_types{gt};
-		new_client.response_types{rt}
+		gt = body["grant_types"].
+			template get<std::unordered_set<std::string>>();
+	}
+	
+	if (body.contains("response_types"))
+	{
+		rt = body["response_types"].
+			template get<std::unordered_set<std::string>>();
+	}
 
-		if (new_client.grant_types.conatins("authorization_code") && 
-			!new_client.response_types.conatins("code"))
+	if (body.contains("grant_types") && body.contains("response_types"))
+	{
+		new_client.grant_types = gt;
+		new_client.response_types = rt;
+
+		if (new_client.grant_types.contains("authorization_code") && 
+			!new_client.response_types.contains("code"))
 		{
 			new_client.response_types.insert("code");
 			body["response_types"].push_back("code");
 		}
 
-		if (!new_client.grant_types.conatins("authorization_code") && 
-			new_client.response_types.conatins("code"))
+		if (!new_client.grant_types.contains("authorization_code") && 
+			new_client.response_types.contains("code"))
 		{
 			new_client.grant_types.insert("authorization_code");
 			body["grant_types"].push_back("authorization_code");
 		}
 	}
-	else if (body.contains["grant_types"])
+	else if (body.contains("grant_types"))
 	{
-		new_client.grant_types{gt};
+		new_client.grant_types = gt;
 		
-		if (new_client.grant_types.conatins("authorization_code"))
+		if (new_client.grant_types.contains("authorization_code"))
 		{
 			new_client.response_types.insert("code");
 			body["response_types"].push_back("code");
 		}
 	}
-	else if (body.contains["response_types"])
+	else if (body.contains("response_types"))
 	{
-		new_client.response_types{rt};
+		new_client.response_types = rt;
 		
-		if (new_client.response_types.conatins("code"))
+		if (new_client.response_types.contains("code"))
 		{
 			new_client.grant_types.insert("authorization_code");
 			body["grant_types"].push_back("authorization_code");
@@ -501,9 +515,10 @@ crow::response register::operator()(const crow::request& req) const
 		new_client.response_types.insert("code");
 		body["response_types"].push_back("code");
 	}
-
-	if (!gt.extract("authorization_code").empty() || 
-		!rt.extract("code").empty())
+	
+	gt.erase("authorization_code");
+	rt.erase("code");
+	if (!gt.empty() || !rt.empty())
 	{
 		CROW_LOG_WARNING << "inv rt gt";
 		return send_error("invalid_client_metadata", 400);
@@ -517,7 +532,7 @@ crow::response register::operator()(const crow::request& req) const
 
 	if (body["redirect_uris"].is_array())
 		new_client.redirect_uris = 
-			body["redirect_uris"].template get<std::vector<std::string>>()
+			body["redirect_uris"].template get<std::vector<std::string>>();
 	else
 		new_client.redirect_uris.push_back(body["redirect_uris"]);
 	
@@ -527,34 +542,45 @@ crow::response register::operator()(const crow::request& req) const
 		CROW_LOG_WARNING << "redirect uri missed";
 		return send_error("invalid_redirect_uri", 400);
 	}
+	
+	if (!body.contains("client_uri"))
+	{
+		CROW_LOG_WARNING << "client uri missed";
+		return send_error("invalid_client_uri", 400);
+	}	
+	
+	new_client.client_uri  = body["client_uri"];
 
 	if (body["client_name"].is_string())
 		new_client.client_name  = body["client_name"];
-
-	if (body["client_uri"].is_string())
-		new_client.client_name  = body["client_uri"];
-
+	
 	if (body["scope"].is_string())
-		new_client.client_name  = get_scopes(body["scope"]);
-
-	new_client.client_id_created_at(
-		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())
-	);
+	{
+		new_client.scopes = 
+			get_scopes(body["scope"].template get<std::string>());
+	}
+	new_client.client_id_created_at = 
+		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	body["client_id_created_at"] = new_client.client_id_created_at;
+	
 	new_client.client_id_expires_at = 0;
 	body["client_id_expires_at"] = new_client.client_id_expires_at;
+	
 	srand((unsigned)time(NULL) * getpid());
-	new_client->client_id = gen_random(12);
-	body["client_id"] = new_client->client_id; 
+	new_client.client_id = gen_random(12);
+	body["client_id"] = new_client.client_id; 
+	
 	if(Client::token_endpoint_auth_methods.contains(
 		new_client.token_endpoint_auth_method))
 	{
 		srand((unsigned)time(NULL) * getpid());
 		new_client.client_secret = gen_random(16);
-		body["client_secret"] = new_client->client_secret; 
+		body["client_secret"] = new_client.client_secret; 
 	}
-	new_client.create();
-	resp.code(201);
+
+	new_client.save();
+	
+	resp.code = 201;
 	resp.body = body.dump(4);
 	return resp;
 }

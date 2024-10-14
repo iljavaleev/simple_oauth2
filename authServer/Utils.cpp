@@ -105,6 +105,7 @@ std::unordered_map<std::string, std::string> parse_form_data(std::string form)
     return res;
 }
 
+
 crow::response send_error(std::string&& message, int code)
 {
     crow::response resp;
@@ -113,6 +114,7 @@ crow::response send_error(std::string&& message, int code)
     resp.body =  j.dump();
     return resp;
 }
+
 
 std::string url_encode(const std::string& decoded)
 {
@@ -158,6 +160,7 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
     res.pop_back();
     return res;
 }
+
 
 jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier()
 {
