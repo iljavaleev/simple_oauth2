@@ -221,7 +221,7 @@ json get_answer(const Client& client, const std::string& uri)
         response = json::parse(r.text);
     else
         response["error"] = r.status_code;
-        
+   
     return response;
 }
 

@@ -199,6 +199,18 @@ std::shared_ptr<State> State::create(const Client& client)
     auto doc = bsoncxx::builder::basic::document{};
     doc.append(kvp("client_id", client.client_id));
     doc.append(kvp("state", state));
+
+    auto outer = bsoncxx::builder::basic::document{};
+    outer.append(kvp("$set", doc));
+    try
+    {
+        db->get_state_collection().update_one(
+            st.view(), outer.view(), options);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
     return res;
 }
     

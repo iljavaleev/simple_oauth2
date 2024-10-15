@@ -40,9 +40,9 @@ public:
         ));
         client = mongocxx::client(uri);
         db = client[_db]; 
-        client_collection = db["client"];
-        token_collection = db["server"];
-        state_collection = db["state"];
+        client_collection = db["client_c"];
+        token_collection = db["server_c"];
+        state_collection = db["state_c"];
     }
     mongocxx::collection get_client_collection() const 
     { 

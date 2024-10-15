@@ -61,9 +61,7 @@ crow::response authorize::operator()(const crow::request& req) const
             return res;
         }
     }
-    
     auto state = State::create(client);
-
     json options = {
         {"response_type", "code"},
         {"client_uri", Client::client_uri},
@@ -73,7 +71,7 @@ crow::response authorize::operator()(const crow::request& req) const
 		{"redirect_uri", client.redirect_uris.at(0)},
 		{"state", state->state}
     };
-    CROW_LOG_WARNING << options.dump();
+
     std::string uri = build_url(server.authorization_endpoint, options);
     res.redirect(uri);
     return res;
