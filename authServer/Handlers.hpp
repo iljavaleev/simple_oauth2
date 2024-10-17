@@ -2,7 +2,8 @@
 #define Handlers_hpp
 
 #include "crow.h"
-
+#include "ClientMetadataMW.hpp"
+#include "AuthorizeConfigurationMW.hpp"
 
 struct idx
 {
@@ -38,7 +39,18 @@ struct revoke_handler
 
 struct register_handler
 {
-   crow::response operator()(const crow::request& req) const;
+    crow::App<ClientMetadataMW, AuthorizeConfigurationMW>& app;
+    register_handler(
+        crow::App<ClientMetadataMW, AuthorizeConfigurationMW>& _app):app(_app){}
+    crow::response operator()(const crow::request& req) const;
+};
+
+struct client_management_handler
+{
+    crow::App<ClientMetadataMW, AuthorizeConfigurationMW>& app;
+    client_management_handler(
+        crow::App<ClientMetadataMW, AuthorizeConfigurationMW>& _app):app(_app){}
+    crow::response operator()(const crow::request&, std::string&&) const;
 };
 
 #endif

@@ -11,6 +11,7 @@
 
 #include "DB.hpp"
 #include "Utils.hpp"
+#include "ClientMetadataMW.hpp"
 
 #include "inja.hpp"
 #include <nlohmann/json.hpp>
@@ -18,6 +19,7 @@
 
 
 using json = nlohmann::json;
+using namespace models;
 
 inja::Environment env;
 const std::string WORKDIR = std::getenv("WORKDIR");
@@ -424,163 +426,99 @@ crow::response revoke_handler::operator()(const crow::request& req) const
 
 crow::response register_handler::operator()(const crow::request& req) const
 {
-	Client new_client;
-	json body;
-	crow::response resp;
-	try
-	{
-		body = json::parse(req.body);
-	}
-	catch(const std::exception& e)
-	{
-		CROW_LOG_WARNING << e.what();
-		resp.code = 400;
-		return resp;
-	}
-	
-	if (body.contains("token_endpoint_auth_method"))
-	{
-		new_client.token_endpoint_auth_method = 
-			body["token_endpoint_auth_method"];
-	}
-	else
-	{
-		new_client.token_endpoint_auth_method = "secret_basic";
-		body["token_endpoint_auth_method"] = "secret_basic";
-	}
-	
-	if (!Client::token_endpoint_auth_methods.
-		contains(new_client.token_endpoint_auth_method))
-	{
-		return send_error("invalid_client_metadata", 400);
-	}
-	
-	std::unordered_set<std::string> gt, rt;
-	if (body.contains("grant_types"))
-	{
-		gt = body["grant_types"].
-			template get<std::unordered_set<std::string>>();
-	}
-	
-	if (body.contains("response_types"))
-	{
-		rt = body["response_types"].
-			template get<std::unordered_set<std::string>>();
-	}
-
-	if (body.contains("grant_types") && body.contains("response_types"))
-	{
-		new_client.grant_types = gt;
-		new_client.response_types = rt;
-
-		if (new_client.grant_types.contains("authorization_code") && 
-			!new_client.response_types.contains("code"))
-		{
-			new_client.response_types.insert("code");
-			body["response_types"].push_back("code");
-		}
-
-		if (!new_client.grant_types.contains("authorization_code") && 
-			new_client.response_types.contains("code"))
-		{
-			new_client.grant_types.insert("authorization_code");
-			body["grant_types"].push_back("authorization_code");
-		}
-	}
-	else if (body.contains("grant_types"))
-	{
-		new_client.grant_types = gt;
-		
-		if (new_client.grant_types.contains("authorization_code"))
-		{
-			new_client.response_types.insert("code");
-			body["response_types"].push_back("code");
-		}
-	}
-	else if (body.contains("response_types"))
-	{
-		new_client.response_types = rt;
-		
-		if (new_client.response_types.contains("code"))
-		{
-			new_client.grant_types.insert("authorization_code");
-			body["grant_types"].push_back("authorization_code");
-		}
-	}
-	else
-	{
-		new_client.grant_types.insert("authorization_code");
-		body["grant_types"].push_back("authorization_code");
-		
-		new_client.response_types.insert("code");
-		body["response_types"].push_back("code");
-	}
-	
-	gt.erase("authorization_code");
-	rt.erase("code");
-	if (!gt.empty() || !rt.empty())
-	{
-		CROW_LOG_WARNING << "inv rt gt";
-		return send_error("invalid_client_metadata", 400);
-	}
-
-	if (!body.contains("redirect_uris"))
-	{
-		CROW_LOG_WARNING << "redirect uri missed";
-		return send_error("invalid_redirect_uri", 400);
-	}	
-
-	if (body["redirect_uris"].is_array())
-		new_client.redirect_uris = 
-			body["redirect_uris"].template get<std::vector<std::string>>();
-	else
-		new_client.redirect_uris.push_back(body["redirect_uris"]);
-	
-	if (new_client.redirect_uris.empty() || 
-		new_client.redirect_uris.at(0).empty())
-	{
-		CROW_LOG_WARNING << "redirect uri missed";
-		return send_error("invalid_redirect_uri", 400);
-	}
-	
-	if (!body.contains("client_uri"))
-	{
-		CROW_LOG_WARNING << "client uri missed";
-		return send_error("invalid_client_uri", 400);
-	}	
-	
-	new_client.client_uri  = body["client_uri"];
-
-	if (body["client_name"].is_string())
-		new_client.client_name  = body["client_name"];
-	
-	if (body["scope"].is_string())
-	{
-		new_client.scopes = 
-			get_scopes(body["scope"].template get<std::string>());
-	}
-	new_client.client_id_created_at = 
-		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	body["client_id_created_at"] = new_client.client_id_created_at;
-	
-	new_client.client_id_expires_at = 0;
-	body["client_id_expires_at"] = new_client.client_id_expires_at;
+	const auto& ctx = app.get_context<ClientMetadataMW>(req);
+	models::Client new_client = ctx.new_client;
 	
 	srand((unsigned)time(NULL) * getpid());
-	new_client.client_id = gen_random(12);
-	body["client_id"] = new_client.client_id; 
-	
-	if(Client::token_endpoint_auth_methods.contains(
-		new_client.token_endpoint_auth_method))
+    new_client.client_id = gen_random(12);
+	new_client.client_id_created_at = 
+		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    new_client.client_id_expires_at = 0;
+
+
+	if(models::Client::token_endpoint_auth_methods.contains(
+        new_client.token_endpoint_auth_method))
 	{
 		srand((unsigned)time(NULL) * getpid());
 		new_client.client_secret = gen_random(16);
-		body["client_secret"] = new_client.client_secret; 
 	}
 
+	srand((unsigned)time(NULL) * getpid());
+	new_client.registration_access_token = gen_random(12);
+	new_client.registration_client_uri = std::format(
+		"http://{}:{}/register/{}", 
+		std::getenv("SERVER"), 
+		std::getenv("SERVER_PORT"), 
+		new_client.client_id);
+	
+	crow::response resp;
+	json body = new_client;
+	
 	new_client.save();
 	
 	resp.code = 201;
 	resp.body = body.dump(4);
 	return resp;
 }
+
+crow::response client_management_handler::operator()(
+	const crow::request& req, std::string&& client_d) const
+{
+	crow::response resp;
+	models::Client client; 
+	if (req.method == crow::HTTPMethod::GET)
+	{
+		const auto& ctx = app.get_context<AuthorizeConfigurationMW>(req);
+		client = ctx.req_client;
+		
+		srand((unsigned)time(NULL) * getpid());
+		client.client_secret = gen_random(12);
+
+		srand((unsigned)time(NULL) * getpid());
+		client.registration_access_token = gen_random(16);
+		client.save();
+		
+		json jresp = client;
+		resp.body = jresp.dump(4);
+		return resp;
+	}
+
+	if (req.method == crow::HTTPMethod::PUT)
+	{
+		const auto& ctx = app.get_context<ClientMetadataMW>(req);
+		client = ctx.req_client;
+		
+	}
+
+	// // if (req.method == crow::HTTPMethod::DELETE)
+	
+	
+	
+	crow::response resp;
+	// resp.body = req.get_body_params();
+    return resp;
+}
+
+// {
+// "client_name": "OAuth Client",
+// "redirect_uris": ["http://localhost:9000/callback"],
+// "client_uri": "http://localhost:9000/",
+// "grant_types": ["authorization_code"],
+// "scope": "foo bar baz"
+// }
+
+// {
+// "client_id": "1234-wejeg-0392",
+// "client_secret": "6trfvbnklp0987trew2345tgvcxcvbjkiou87y6t5r",
+// "client_id_issued_at": 2893256800,
+// "client_secret_expires_at": 0,
+// "token_endpoint_auth_method": "client_secret_basic",
+// "client_name": "OAuth Client",
+// "redirect_uris": ["http://localhost:9000/callback"],
+// "client_uri": "http://localhost:9000/",
+// "grant_types": ["authorization_code"],
+// "response_types": ["code"],
+// "scope": "foo bar baz",
+// "registration_client_uri": "http://localhost:9001/register/1234-wejeg-0392"
+// "registration_access_token": "ogh238fj2f0zFaj38dA"
+// }

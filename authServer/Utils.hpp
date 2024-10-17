@@ -17,6 +17,7 @@ std::string encode_client_credentials(
 std::vector<std::string> decode_client_credentials( const std::string& code);
 std::unordered_map<std::string, std::string> parse_form_data(std::string form);
 crow::response send_error(std::string&& message, int code);
+void send_error(crow::response& resp, std::string&& message, int code);
 std::string url_decode(const std::string& encoded);
 std::string url_encode(const std::string& decoded);
 std::unordered_set<std::string> get_scopes(const std::string& query);

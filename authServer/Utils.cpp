@@ -116,6 +116,14 @@ crow::response send_error(std::string&& message, int code)
 }
 
 
+void send_error(crow::response& resp, std::string&& message, int code)
+{
+    resp.code = code;
+    json j = {{ "error", message }};
+    resp.body = j.dump();
+}
+
+
 std::string url_encode(const std::string& decoded)
 {
     const auto encoded_value = curl_easy_escape(
