@@ -445,7 +445,7 @@ namespace models
     }
 
 
-     void to_json(json& j, const Client& cl) 
+    void to_json(json& j, const Client& cl) 
     {
         j = json{ 
             {"client_id", cl.client_id}, 

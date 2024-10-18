@@ -7,8 +7,12 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+namespace models
+{
+    struct Client;
+}
+using Client = models::Client;
 
-struct Client;
 std::string gen_random(const int len);
 std::string build_url(std::string base, nlohmann::json options);
 std::string encode_client_credentials(
@@ -22,6 +26,7 @@ bool get_token(
 bool refresh_token(Client& client, const std::string& uri);
 void register_client(Client& client);
 json get_answer(const Client& client, const std::string& uri);
+json get_client_info(const Client& client);
 std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);
 std::string url_decode(const std::string& encoded);

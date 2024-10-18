@@ -21,6 +21,7 @@ const std::string WORKDIR = std::getenv("WORKDIR");
 
 
 std::string gen_random(const int len) {
+    srand((unsigned)time(NULL) * getpid());
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

@@ -181,10 +181,5 @@ namespace models
 
     void to_json(json& j, const Client& cl);
     void from_json(const json& j, Client& cl);
-    //  json jj = cl;
-    
-    // std::cout << jj.dump(4) << "\n";
-
-    // auto cl2 = jj.template get<ns::Client>();
 }
 #endif

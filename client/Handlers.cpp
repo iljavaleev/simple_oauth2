@@ -9,6 +9,9 @@
 #include "DB.hpp"
 
 using json = nlohmann::json;
+using Client = models::Client;
+using Server = models::Server;
+using State = models::State;
 
 inja::Environment env;
 const std::string WORKDIR = std::getenv("WORKDIR");
@@ -27,7 +30,6 @@ const std::string token_endpoint = std::format(
     std::getenv("SERVER"), 
     std::getenv("SERVER_PORT")
 );
-
 
 crow::mustache::rendered_template idx::operator()(
     const crow::request& req) const
@@ -223,4 +225,39 @@ crow::mustache::rendered_template revoke_refresh_handler::operator()(
     }
     auto page = crow::mustache::compile(res);
     return page.render();
+}
+
+
+
+crow::mustache::rendered_template read_client::operator()(
+    const crow::request&) const
+{
+    json response = get_client_info(client);
+    std::string res;
+    
+    if (response.contains("error"))
+    {
+        res = env.render(error_temp, response["error"]);
+    }
+    else
+    {
+        res = env.render(data_temp, response);
+    }
+    auto page = crow::mustache::compile(res);
+    return page.render();
+}
+
+
+crow::mustache::rendered_template update_client::operator()(
+    const crow::request&) const
+{
+    json response = update_client_info(client);
+    
+}
+
+
+crow::mustache::rendered_template delete_client::operator()(
+    const crow::request&) const
+{
+
 }

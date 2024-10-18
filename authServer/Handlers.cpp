@@ -23,6 +23,8 @@ using namespace models;
 
 inja::Environment env;
 const std::string WORKDIR = std::getenv("WORKDIR");
+const std::string server_uri = std::format("{}:{}", 
+	std::getenv("SERVER"), std::getenv("SERVER_PORT"));
 inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
 inja::Template appr_temp = env.parse_template(WORKDIR + "/files/approve.html");
 inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
@@ -41,16 +43,16 @@ crow::mustache::rendered_template idx::operator()(
 	json render_json;
 	std::vector<json> res_json;
 
-	for (const auto& cl: clients)
+	for (auto& cl: clients)
 	{
-		json client_json;
-		client_json["client_id"] = cl->client_id;
-		client_json["client_secret"] = cl->client_secret;
-		client_json["scope"] = get_scopes(cl->scopes);
-		client_json["redirect_uri"] = cl->redirect_uris.at(0);
+		json client_json = *cl;
 		res_json.push_back(client_json);
 	}
 	render_json["clients"] = res_json;
+	render_json["auth_server"] = {
+		{"authorization_endpoint", server_uri + "/authorize"}, 
+		{"token_endpoint", server_uri + "/token"}
+	};
 	std::string res = env.render(index_temp, render_json);
 	auto page = crow::mustache::compile(res);
 	return page.render();
@@ -108,7 +110,6 @@ crow::mustache::rendered_template authorize::operator()(
 	}
 	    
 	crow::query_string query = req.url_params;
-	srand((unsigned)time(NULL) * getpid());
     const std::string reqid = gen_random(8);
     
 	Request request(reqid, req.raw_url);
@@ -205,7 +206,7 @@ crow::response approve::operator()(const crow::request& req) const
 		resp.redirect(url_parsed);
 		return resp;
 	} 
-	srand((unsigned)time(NULL) * getpid());
+	
 	std::string code = gen_random(12);
 	Code code_inst(code, request->query, scopes);
 	
@@ -429,7 +430,6 @@ crow::response register_handler::operator()(const crow::request& req) const
 	const auto& ctx = app.get_context<ClientMetadataMW>(req);
 	models::Client new_client = ctx.new_client;
 	
-	srand((unsigned)time(NULL) * getpid());
     new_client.client_id = gen_random(12);
 	new_client.client_id_created_at = 
 		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -439,11 +439,9 @@ crow::response register_handler::operator()(const crow::request& req) const
 	if(models::Client::token_endpoint_auth_methods.contains(
         new_client.token_endpoint_auth_method))
 	{
-		srand((unsigned)time(NULL) * getpid());
 		new_client.client_secret = gen_random(16);
 	}
 
-	srand((unsigned)time(NULL) * getpid());
 	new_client.registration_access_token = gen_random(12);
 	new_client.registration_client_uri = std::format(
 		"http://{}:{}/register/{}", 
@@ -465,37 +463,72 @@ crow::response client_management_handler::operator()(
 	const crow::request& req, std::string&& client_d) const
 {
 	crow::response resp;
-	models::Client client; 
+	const auto& ctx = app.get_context<AuthorizeConfigurationMW>(req);
+	models::Client client = ctx.req_client;
+
 	if (req.method == crow::HTTPMethod::GET)
 	{
-		const auto& ctx = app.get_context<AuthorizeConfigurationMW>(req);
-		client = ctx.req_client;
 		
-		srand((unsigned)time(NULL) * getpid());
 		client.client_secret = gen_random(12);
-
-		srand((unsigned)time(NULL) * getpid());
 		client.registration_access_token = gen_random(16);
 		client.save();
 		
 		json jresp = client;
 		resp.body = jresp.dump(4);
-		return resp;
 	}
-
-	if (req.method == crow::HTTPMethod::PUT)
+	else if (req.method == crow::HTTPMethod::PUT)
 	{
-		const auto& ctx = app.get_context<ClientMetadataMW>(req);
-		client = ctx.req_client;
+		json body = json::parse(req.body);
+		bool client_id_varif = body.contains("client_id") && 
+			body["client_id"] == client.client_id;
+		bool client_secret_varif = body.contains("client_secret") && 
+			body["client_secret"] == client.client_id;
+		   
+		if (!(client_id_varif && client_secret_varif))
+		{
+			CROW_LOG_WARNING << "PUT; client varification error";
+			send_error("invalid_client_metadata", 400);
+		}
 		
+		const auto& client_mdata_ctx = app.get_context<ClientMetadataMW>(req);
+		models::Client result_client, req_client{client_mdata_ctx.new_client};
+		
+		result_client.client_id = client.client_id;
+		result_client.client_secret = client.client_secret;
+		result_client.client_id_created_at = client.client_id_created_at;
+		result_client.client_id_expires_at = client.client_id_expires_at;
+		result_client.registration_access_token = 
+			client.registration_access_token;
+		result_client.registration_client_uri = client.registration_client_uri;
+		
+		result_client.token_endpoint_auth_method = 
+			req_client.token_endpoint_auth_method;
+		result_client.redirect_uris = req_client.redirect_uris;
+		result_client.client_uri = req_client.client_uri;
+		result_client.scopes = req_client.scopes;
+		result_client.grant_types = req_client.grant_types;
+		result_client.response_types = req_client.response_types;
+		result_client.client_name = req_client.client_name;
+		
+		result_client.save();
+		
+		json jresp = result_client;
+		resp.body = jresp.dump();
+		resp.code = 200;
 	}
-
-	// // if (req.method == crow::HTTPMethod::DELETE)
-	
-	
-	
-	crow::response resp;
-	// resp.body = req.get_body_params();
+	else if (req.method == crow::HTTPMethod::DELETE)
+	{
+		json body = json::parse(req.body);
+		try
+		{
+			models::Client::destroy(body["client_id"]);
+		}
+		catch(const std::exception& e)
+		{
+			CROW_LOG_WARNING << e.what();
+		}
+		resp.code = 204;
+	}
     return resp;
 }
 

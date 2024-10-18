@@ -32,7 +32,40 @@
       <div class="jumbotron">
 		  <h2>Data from protected resource:</h2>
       <pre>{{ resource }}</pre>
-      </div>
+      <h2>User information:</h2>
+		  {% if client %}
+		  <ul>
+			  <li><b>client_id:</b> <code>{{ client.client_id }}</code></li>
+			  <li><b>client_secret:</b> <code>{{ client.client_secret }}</code></li>
+        <li><b>scope:</b> 
+        {% for s in client.scopes %}
+          <code>{{ s }}</code>
+        {% endfor %}
+        </li>
+        <li><b>redirect_uri:</b> 
+          {% for ru in client.redirect_uris %}
+            <code>{{ ru }}</code>
+          {% endfor %}
+        </li>		    
+        <li><b>client_uri:</b> <code>{{ client.client_uri }}</code></li>
+        <li><b>client_id_created_at:</b> <code>{{ client.client_id_created_at }}</code></li>
+			  <li><b>client_id_expires_at:</b> <code>{{ client.client_id_expires_at }}</code></li>
+        <li><b>registration_access_token:</b> <code>{{ client.registration_access_token }}</code></li>
+        <li><b>registration_client_uri:</b> <code>{{ client.registration_client_uri }}</code></li>
+        <li><b>token_endpoint_auth_method:</b> <code>{{ client.token_endpoint_auth_method }}</code></li>
+        <li><b>grant_types:</b> 
+          {% for gt in client.grant_types %}
+            <code>{{ gt }}</code>
+          {% endfor %}
+        </li>
+        <li><b>response_types:</b> 
+          {% for rt in client.response_types %}
+            <code>{{ rt }}</code>
+          {% endfor %}
+        </li>
+			  <li><b>client_name:</b> <code>{{ client.client_name }}</code></li>
+		   </ul>
+		  {% endif %}
 
     </div>
 

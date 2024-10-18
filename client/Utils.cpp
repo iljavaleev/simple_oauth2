@@ -11,6 +11,9 @@
 
 
 using json = nlohmann::json;
+using Client = models::Client;
+using Server = models::Server;
+
 const std::string SERVER_URI = std::format(
     "{}:{}", std::getenv("SERVER"), std::getenv("SERVER_PORT"));
 
@@ -223,6 +226,59 @@ json get_answer(const Client& client, const std::string& uri)
         response["error"] = r.status_code;
    
     return response;
+}
+
+
+json get_client_info(const Client& client)
+{
+    cpr::Response r = cpr::Post(
+        cpr::Url{client.registration_client_uri},
+        cpr::Header{
+            {"Accept", "application/json"},
+            {"Authorization", "Bearer " + client.registration_access_token}
+        });
+    json response;
+    if (r.status_code == 200)
+        return {{"client", json::parse(r.text)}};
+    
+    return {{"error", 
+        std::format("Unable to read client {}", r.status_code)}};
+}
+
+
+json update_client_info(const Client& client)
+{
+    json request = client, response;
+
+    response.erase("client_id_issued_at");
+    response.erase("client_secret_expires_at");
+    response.erase("registration_client_uri");
+    response.erase("registration_access_token");
+    response.erase("access_token");
+    response.erase("refresh_token");
+
+    cpr::Response r = cpr::Put(
+        cpr::Url{client.registration_client_uri},
+        cpr::Header{
+            {"Content-Type", "application/json"},
+            {"Accept", "application/json"},
+            {"Authorization", "Bearer " + client.registration_access_token}
+        },
+        cpr::Body{request.dump()}
+    );
+    Client res_client;
+    if (r.status_code == 200)
+    {
+        res_client = json::parse(r.text).template get<Client>();
+        // обновить client
+        return {{"client", json::parse(r.text)}};
+    }
+        
+    
+    return {{"error", 
+        std::format("Unable to read client {}", r.status_code)}};
+    
+    
 }
 
 

@@ -19,7 +19,8 @@
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_array;
 using bsoncxx::builder::basic::make_document;
- 
+using json = nlohmann::json;
+
 inline mongocxx::instance instance{};
 
 
@@ -58,61 +59,67 @@ public:
     }
 };
 
-
-struct ProtectedResource
+namespace models
 {
-    std::string uri;
-    ProtectedResource(const std::string& _uri):uri(_uri){}
-};
+    struct ProtectedResource
+    {
+        std::string uri;
+        ProtectedResource(const std::string& _uri):uri(_uri){}
+    };
 
 
-struct Server
-{
-    std::string authorization_endpoint;
-    std::string token_endpoint;
+    struct Server
+    {
+        std::string authorization_endpoint;
+        std::string token_endpoint;
 
-    Server(
-        const std::string& _auth, 
-        const std::string& _token
-        ):
-        authorization_endpoint(_auth), token_endpoint(_token){}
-};
-
-
-struct State
-{
-    std::string state;
-    std::string client_id;
-
-    static std::shared_ptr<State> get(const Client& client);
-    static std::shared_ptr<State> create(const Client& client);
-};
+        Server(
+            const std::string& _auth, 
+            const std::string& _token
+            ):
+            authorization_endpoint(_auth), token_endpoint(_token){}
+    };
 
 
-struct Client
-{
-    std::string access_token;
-    std::string refresh_token;
-    
-    std::string client_id;
-    std::string client_secret;
-    std::vector<std::string> redirect_uris;
-    std::unordered_set<std::string> scopes;
-    
-    time_t client_id_created_at;
-    time_t client_id_expires_at;
-    std::string client_name;
+    struct State
+    {
+        std::string state;
+        std::string client_id;
 
-    std::unordered_set<std::string> grant_types;
-    std::unordered_set<std::string> response_types;
-    std::string token_endpoint_auth_method;
-    
-    const static std::string client_uri;
-    const static std::unordered_set<std::string> token_endpoint_auth_methods;
+        static std::shared_ptr<State> get(const Client& client);
+        static std::shared_ptr<State> create(const Client& client);
+    };
 
-    void save();
-    static std::shared_ptr<Client> get(); 
-    static bool destroy(const std::string& client_id);
-};
+    struct Client
+    {
+        std::string access_token;
+        std::string refresh_token;
 
+        std::string client_id;
+        std::string client_secret;
+        std::vector<std::string> redirect_uris;
+        std::unordered_set<std::string> scopes;
+        
+        time_t client_id_created_at;
+        time_t client_id_expires_at;
+        std::string client_name;
+        
+        std::unordered_set<std::string> grant_types;
+        std::unordered_set<std::string> response_types;
+        std::string token_endpoint_auth_method;
+        
+        std::string registration_client_uri;
+        std::string registration_access_token;
+
+        const static std::string client_uri;
+        const static std::unordered_set<std::string> token_endpoint_auth_methods;
+
+        void save();
+        static std::shared_ptr<Client> get(); 
+        static bool destroy(const std::string& client_id);
+    };
+
+    void to_json(json& j, const Client& cl);
+    void from_json(const json& j, Client& cl);
+}
 #endif

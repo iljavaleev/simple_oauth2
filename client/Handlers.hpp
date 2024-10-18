@@ -9,6 +9,10 @@
 #include "DB.hpp"
 
 
+using Client = models::Client;
+using Server = models::Server;
+
+
 struct idx{ 
     Client& client;
     idx(Client&  _cl): client(_cl){} 
@@ -62,6 +66,27 @@ struct revoke_handler{
 struct revoke_refresh_handler{
     Client& client;
     revoke_refresh_handler(Client& _client): client(_client){}
+    crow::mustache::rendered_template operator()(const crow::request&) const;
+};
+
+
+struct read_client{
+    Client& client;
+    read_client(Client& _client): client(_client){}
+    crow::mustache::rendered_template operator()(const crow::request&) const;
+};
+
+
+struct update_client{
+    Client& client;
+    update_client(Client& _client): client(_client){}
+    crow::mustache::rendered_template operator()(const crow::request&) const;
+};
+
+
+struct delete_client{
+    Client& client;
+    delete_client(Client& _client): client(_client){}
     crow::mustache::rendered_template operator()(const crow::request&) const;
 };
 
