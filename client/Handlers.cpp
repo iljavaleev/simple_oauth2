@@ -34,14 +34,15 @@ const std::string token_endpoint = std::format(
 crow::mustache::rendered_template idx::operator()(
     const crow::request& req) const
 {
-    json render_json;
+    json render_json, client_json;
+    client_json = client;
     render_json["access_token"] = !client.access_token.empty() ? 
         client.access_token : "NONE";
     render_json["refresh_token"] = !client.refresh_token.empty() ? 
         client.refresh_token : "NONE";
     render_json["scope"] = !client.scopes.empty() ? 
         get_scopes(client.scopes) : "NONE";
-    
+    render_json["client"] = client_json;
     std::string res = env.render(index_temp, render_json);
     auto page = crow::mustache::compile(res);
     return page.render();
@@ -249,15 +250,51 @@ crow::mustache::rendered_template read_client::operator()(
 
 
 crow::mustache::rendered_template update_client::operator()(
-    const crow::request&) const
+    const crow::request& req) const
 {
     json response = update_client_info(client);
-    
+    std::string res;
+    auto form_data = parse_form_data(req.body);
+    try
+    {
+        client.client_name = form_data.at("client_name");
+    }
+    catch(const std::exception& e)
+    {
+        CROW_LOG_WARNING << e.what();
+        res = env.render(error_temp, e.what());
+        auto page = crow::mustache::compile(res);
+        return page.render();
+    }
+         
+    if (response.contains("error"))
+    {
+        res = env.render(error_temp, response["error"]);
+    }
+    else
+    {
+        res = env.render(index_temp, response);
+    }
+
+    auto page = crow::mustache::compile(res);
+    return page.render();
 }
 
 
 crow::mustache::rendered_template delete_client::operator()(
     const crow::request&) const
 {
-
+    json response = delete_client_request(client);
+    std::string res;
+    
+    if (response.contains("error"))
+    {
+        res = env.render(error_temp, response["error"]);
+    }
+    else
+    {
+        res = env.render(index_temp, response);
+    }
+    auto page = crow::mustache::compile(res);
+    return page.render();
 }

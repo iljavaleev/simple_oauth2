@@ -246,7 +246,7 @@ json get_client_info(const Client& client)
 }
 
 
-json update_client_info(const Client& client)
+json update_client_info(Client& client)
 {
     json request = client, response;
 
@@ -270,15 +270,49 @@ json update_client_info(const Client& client)
     if (r.status_code == 200)
     {
         res_client = json::parse(r.text).template get<Client>();
-        // обновить client
-        return {{"client", json::parse(r.text)}};
+        client.client_secret = res_client.client_secret;
+        client.redirect_uris = res_client.redirect_uris;
+        client.scopes = res_client.scopes;
+        client.client_name = res_client.client_name;
+        client.grant_types = res_client.grant_types;
+        client.response_types = res_client.response_types;
+        client.token_endpoint_auth_method = 
+            res_client.token_endpoint_auth_method;
+        client.save();
+
+        return {
+            {"client", json::parse(r.text)},
+            {"access_token", client.access_token},
+            {"refresh_token", client.refresh_token},
+            {"scope", get_scopes(client.scopes)}
+        };
     }
-        
-    
     return {{"error", 
         std::format("Unable to read client {}", r.status_code)}};
+}
+
+
+json delete_client_request(const Client& client)
+{
+    cpr::Response r = cpr::Delete(
+        cpr::Url{client.registration_client_uri},
+        cpr::Header{
+            {"Authorization", "Bearer " + client.registration_access_token}
+        }
+    );
+    Client::destroy(client.client_id);
     
-    
+    if (r.status_code == 204)
+    {
+        return {
+            {"client", client},
+            {"access_token", client.access_token},
+            {"refresh_token", client.refresh_token},
+            {"scope", get_scopes(client.scopes)}
+        };
+    }
+    return {{"error", 
+        std::format("Unable to delete client {}", r.status_code)}};
 }
 
 
@@ -324,4 +358,30 @@ std::string url_decode(const std::string& encoded)
     std::string result(decoded_value, output_length);
     curl_free(decoded_value);
     return result;
+}
+
+std::unordered_map<std::string, std::string> parse_form_data(std::string form)
+{
+    std::unordered_map<std::string, std::string> res;
+    char pair_del = '&';
+    char map_del = '=';
+    std::vector<std::string> pairs;
+    
+    std::size_t stop{}; 
+    std::string pair;
+    while ((stop = form.find(pair_del)) != form.npos)
+    {   
+        pairs.emplace_back(form.substr(0, stop));
+        form = form.substr(++stop);
+    }
+    
+    
+    pairs.emplace_back(form);
+    std::string key, value;
+    for (auto p: pairs)
+    {
+        stop = p.find(map_del);
+        res.insert({p.substr(0, stop), p.substr(stop + 1)});    
+    }
+    return res;
 }

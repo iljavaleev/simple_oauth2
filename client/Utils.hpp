@@ -27,10 +27,13 @@ bool refresh_token(Client& client, const std::string& uri);
 void register_client(Client& client);
 json get_answer(const Client& client, const std::string& uri);
 json get_client_info(const Client& client);
+json update_client_info(Client& client);
+json delete_client_request(const Client& client);
 std::unordered_set<std::string> get_scopes(const std::string& query);
 std::string get_scopes(const std::unordered_set<std::string>& scopes);
 std::string url_decode(const std::string& encoded);
 std::string url_encode(const std::string& decoded);
 unsigned int revoke_token(Client& client, std::string&& type);
+std::unordered_map<std::string, std::string> parse_form_data(std::string form);
 
 #endif

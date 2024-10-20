@@ -26,6 +26,13 @@ int main()
         crow::HTTPMethod::POST)(revoke_handler(cl));
     CROW_ROUTE(app, "/revoke_refresh").methods(
         crow::HTTPMethod::POST)(revoke_refresh_handler(cl));
+    
+    CROW_ROUTE(app, "/read_client").methods(
+        crow::HTTPMethod::GET)(read_client(cl));
+    CROW_ROUTE(app, "/update_client").methods(
+        crow::HTTPMethod::POST)(update_client(cl));
+    CROW_ROUTE(app, "/unregister_client").methods(
+        crow::HTTPMethod::GET)(delete_client(cl));
     app.port(9000).run();
     return 0;
 }
