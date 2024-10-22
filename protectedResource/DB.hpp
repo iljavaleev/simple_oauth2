@@ -23,16 +23,16 @@ struct Token
     std::string token;
     std::string client_id;
     time_t expire; 
-    std::unordered_set<std::string> scopes;
+    std::unordered_set<std::string> scope;
     Token(
         const std::string& _token, 
         const std::string& _client_id,
         time_t _expire,
-        const std::unordered_set<std::string> _scopes):
+        const std::unordered_set<std::string> _scope):
     token(_token), 
     client_id(_client_id), 
     expire(_expire), 
-    scopes(_scopes){}
+    scope(_scope){}
 };
 
 #endif

@@ -75,7 +75,7 @@ namespace models
 
         doc.append(kvp("scope", [this](sub_array child) 
         {
-            for (const auto& s : scopes) 
+            for (const auto& s : scope) 
             {
                 child.append(s);
             }
@@ -114,7 +114,7 @@ namespace models
         
         subarr = client["scope"].get_array().value;
         for (bsoncxx::array::element ele : subarr)
-            client_res->scopes.insert(
+            client_res->scope.insert(
                 bsoncxx::string::to_string(ele.get_string().value)
             );
 
@@ -178,7 +178,7 @@ namespace models
             
             subarr = client["scope"].get_array().value;
             for (bsoncxx::array::element ele : subarr)
-                client_res->scopes.insert(
+                client_res->scope.insert(
                     bsoncxx::string::to_string(ele.get_string().value)
                 );
             
@@ -275,7 +275,7 @@ namespace models
             doc.append(kvp("query", query));
             doc.append(kvp("scope", [this](sub_array child) 
             {
-                for (const auto& uri : scopes) 
+                for (const auto& uri : scope) 
                 {
                     child.append(uri);
                 }
@@ -296,17 +296,17 @@ namespace models
         if (!code_value)
             return std::shared_ptr<Code>();
         
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
         bsoncxx::array::view subarr{code_value->view()["scope"].get_array().value};
         for (bsoncxx::array::element ele : subarr)
-            scopes.insert(bsoncxx::string::to_string(ele.get_string().value)); 
+            scope.insert(bsoncxx::string::to_string(ele.get_string().value)); 
         
         return std::make_shared<Code>(
             bsoncxx::string::to_string(
                 code_value->view()["code"].get_string().value),
             bsoncxx::string::to_string(
                 code_value->view()["query"].get_string().value),
-            scopes
+            scope
         );
     }
 
@@ -328,7 +328,7 @@ namespace models
         doc.append(kvp("client_id", client_id));
         doc.append(kvp("scope", [this](sub_array child) 
         {
-            for (const auto& uri : scopes) 
+            for (const auto& uri : scope) 
             {
                 child.append(uri);
             }
@@ -359,7 +359,7 @@ namespace models
         const std::string& token,
         const std::string& client_id, 
         std::time_t exp,
-        std::unordered_set<std::string> scopes    
+        std::unordered_set<std::string> scope  
         )
     {
         mongocxx::options::update options;
@@ -367,9 +367,9 @@ namespace models
         
         auto doc = bsoncxx::builder::basic::document{};
         doc.append(kvp("client_id", client_id));
-        doc.append(kvp("scope", [&scopes](sub_array child) 
+        doc.append(kvp("scope", [&scope](sub_array child) 
         {
-            for (const auto& uri : scopes) 
+            for (const auto& uri : scope) 
             {
                 child.append(uri);
             }
@@ -410,18 +410,18 @@ namespace models
             find_one(make_document(kvp(token_type, std::to_string(hash_token))));
         if (!doc)
             return std::shared_ptr<Token>();
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
     
         bsoncxx::array::view subarr{doc->view()["scope"].get_array().value};
         for (bsoncxx::array::element ele : subarr)
-            scopes.insert(bsoncxx::string::to_string(ele.get_string().value));
+            scope.insert(bsoncxx::string::to_string(ele.get_string().value));
         
         
         return std::make_shared<Token>(
             bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
             bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
             doc->view()["expire"].get_int64(),
-            scopes
+            scope
         );
     }
 
@@ -450,7 +450,7 @@ namespace models
         j = json{ 
             {"client_id", cl.client_id}, 
             {"client_secret", cl.client_secret}, 
-            {"scopes", json(cl.scopes)}, 
+            {"scope", json(cl.scope)}, 
             {"redirect_uris", json(cl.redirect_uris)},
             {"client_id_created_at", cl.client_id_created_at},
             {"client_id_expires_at", cl.client_id_expires_at},
@@ -468,7 +468,7 @@ namespace models
     {
         j.at("client_id").get_to(cl.client_id);
         j.at("client_secret").get_to(cl.client_secret);
-        j.at("scopes").get_to(cl.scopes);
+        j.at("scope").get_to(cl.scope);
         j.at("redirect_uris").get_to(cl.redirect_uris);
         j.at("client_id_created_at").get_to(cl.client_id_created_at);
         j.at("client_id_expires_at").get_to(cl.client_id_expires_at);

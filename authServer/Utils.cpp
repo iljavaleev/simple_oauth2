@@ -149,10 +149,10 @@ std::string url_decode(const std::string& encoded)
 }
 
 
-std::unordered_set<std::string> get_scopes(const std::string& scopes)
+std::unordered_set<std::string> get_scope(const std::string& scope)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(scopes);
+    std::istringstream iss(scope);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);
@@ -160,10 +160,10 @@ std::unordered_set<std::string> get_scopes(const std::string& scopes)
 }
 
 
-std::string get_scopes(const std::unordered_set<std::string>& scopes)
+std::string get_scope(const std::unordered_set<std::string>& scope)
 {
     std::ostringstream ss;
-    for (const auto& s: scopes)
+    for (const auto& s: scope)
         ss << s << " ";
     std::string res = ss.str();
     res.pop_back();

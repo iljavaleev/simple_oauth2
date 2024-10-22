@@ -148,16 +148,21 @@ struct ClientMetadataMW: crow::ILocalMiddleware
             }	
             
             new_client.client_uri  = body["client_uri"];
-
             if (body["client_name"].is_string())
                 new_client.client_name  = body["client_name"];
-            
             if (body["scope"].is_string())
             {
-                new_client.scopes = 
-                    get_scopes(body["scope"].template get<std::string>());
+                new_client.scope = get_scope(
+                    body["scope"].template get<std::string>());   
             }
-                    
+            else if (body.contains("scope"))
+            {
+                CROW_LOG_WARNING <<  body["scope"];
+                new_client.scope = 
+                    body["scope"].template get<std::unordered_set<std::string>>();
+            }
+            json a = new_client;
+            CROW_LOG_WARNING << a.dump();
             ctx.new_client = new_client;
         }    
     }

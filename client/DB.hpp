@@ -98,7 +98,7 @@ namespace models
         std::string client_id;
         std::string client_secret;
         std::vector<std::string> redirect_uris;
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
         
         time_t client_id_created_at;
         time_t client_id_expires_at;

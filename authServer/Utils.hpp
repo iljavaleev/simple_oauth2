@@ -20,8 +20,8 @@ crow::response send_error(std::string&& message, int code);
 void send_error(crow::response& resp, std::string&& message, int code);
 std::string url_decode(const std::string& encoded);
 std::string url_encode(const std::string& decoded);
-std::unordered_set<std::string> get_scopes(const std::string& query);
-std::string get_scopes(const std::unordered_set<std::string>& scopes);
+std::unordered_set<std::string> get_scope(const std::string& query);
+std::string get_scope(const std::unordered_set<std::string>& scope);
 jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier();
 
 #endif

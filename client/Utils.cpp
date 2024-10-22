@@ -14,8 +14,14 @@ using json = nlohmann::json;
 using Client = models::Client;
 using Server = models::Server;
 
-const std::string SERVER_URI = std::format(
-    "{}:{}", std::getenv("SERVER"), std::getenv("SERVER_PORT"));
+const std::string server_uri = std::format(
+    "http://{}:{}", std::getenv("SERVER"), std::getenv("SERVER_PORT"));
+
+const std::string client_uri = std::format(
+    "http://{}:{}", 
+    std::getenv("CLIENT"), 
+    std::getenv("CLIENT_PORT")
+);
 
 
 std::string gen_random(const int len) {
@@ -86,7 +92,7 @@ bool get_token(
         client.access_token = response["access_token"];
         if(response.contains("refresh_token"))
             client.refresh_token = response["refresh_token"];
-        client.scopes = get_scopes(
+        client.scope = get_scope(
             response["scope"].template get<std::string>());
         ret = true;
     }
@@ -102,7 +108,7 @@ bool refresh_token(
     bool ret{false};
 
     cpr::Response token_response = cpr::Post(
-        cpr::Url{SERVER_URI + "/token"},
+        cpr::Url{server_uri + "/token"},
         cpr::Header{
             {"Content-Type", "application/x-www-form-urlencoded"}, 
             {"Authorization", "Basic " + 
@@ -119,7 +125,7 @@ bool refresh_token(
         client.access_token = response["access_token"];
         if(response.contains("refresh_token"))
             client.refresh_token = response["refresh_token"];
-        client.scopes = get_scopes(
+        client.scope = get_scope(
             response["scope"].template get<std::string>());
         ret = true;
     }    
@@ -131,8 +137,8 @@ void register_client(Client& client)
 {   
     json j = {
         {"client_name", "Test name"},
-        {"client_uri", "http://localhost:9000/"},
-        {"redirect_uris", {"http://localhost:9000/callback"}},
+        {"client_uri", client_uri},
+        {"redirect_uris", {client_uri + "/callback"}},
         {"grant_types", {"authorization_code"}},
         {"response_types", {"code"}},
         {"scope", "foo bar"},
@@ -140,7 +146,7 @@ void register_client(Client& client)
     };
     
     cpr::Response r = cpr::Post(
-        cpr::Url{SERVER_URI + "/register"}, 
+        cpr::Url{server_uri + "/register"}, 
         cpr::Header{
             {"Content-Type", "application/json"}, 
             {"Accept", "application/json"}
@@ -159,7 +165,6 @@ void register_client(Client& client)
         {
             CROW_LOG_WARNING << "error parsing register response";
         }
-        CROW_LOG_WARNING << response.dump();
         client.client_id = response["client_id"];
         if (response.contains("client_secret"))
             client.client_secret = response["client_secret"];
@@ -167,6 +172,10 @@ void register_client(Client& client)
             response["token_endpoint_auth_method"];
         client.client_id_created_at = response["client_id_created_at"];
         client.client_id_expires_at = response["client_id_expires_at"];
+        client.registration_client_uri = 
+            response["registration_client_uri"];
+        client.registration_access_token = 
+            response["registration_access_token"];
         client.grant_types = response["grant_types"].
             template get<std::unordered_set<std::string>>();
         client.response_types = response["response_types"].
@@ -177,10 +186,9 @@ void register_client(Client& client)
 		    client.client_name  = response["client_name"];
         if (response.contains("scope"))
         {
-            client.scopes = 
-                get_scopes(response["scope"].template get<std::string>());
+            client.scope = response["scope"].template get<std::unordered_set<std::string>>();
         }
-        
+    
         try
         {
             client.save();
@@ -201,7 +209,7 @@ unsigned int revoke_token(
     std::string token = type == "access_token" ? 
         client.access_token : client.refresh_token;
     cpr::Response revoke_response = cpr::Post(
-        cpr::Url{SERVER_URI + "/revoke"},
+        cpr::Url{server_uri + "/revoke"},
         cpr::Header{
             {"Content-Type", "application/x-www-form-urlencoded"}, 
             {"Authorization", "Basic " + 
@@ -231,13 +239,12 @@ json get_answer(const Client& client, const std::string& uri)
 
 json get_client_info(const Client& client)
 {
-    cpr::Response r = cpr::Post(
+    cpr::Response r = cpr::Get(
         cpr::Url{client.registration_client_uri},
         cpr::Header{
             {"Accept", "application/json"},
             {"Authorization", "Bearer " + client.registration_access_token}
         });
-    json response;
     if (r.status_code == 200)
         return {{"client", json::parse(r.text)}};
     
@@ -248,15 +255,14 @@ json get_client_info(const Client& client)
 
 json update_client_info(Client& client)
 {
-    json request = client, response;
-
-    response.erase("client_id_issued_at");
-    response.erase("client_secret_expires_at");
-    response.erase("registration_client_uri");
-    response.erase("registration_access_token");
-    response.erase("access_token");
-    response.erase("refresh_token");
-
+    json request = client;
+    request["client_uri"] = Client::client_uri;
+    request.erase("client_id_issued_at");
+    request.erase("client_secret_expires_at");
+    request.erase("registration_client_uri");
+    request.erase("registration_access_token");
+    request.erase("access_token");
+    request.erase("refresh_token");
     cpr::Response r = cpr::Put(
         cpr::Url{client.registration_client_uri},
         cpr::Header{
@@ -272,7 +278,7 @@ json update_client_info(Client& client)
         res_client = json::parse(r.text).template get<Client>();
         client.client_secret = res_client.client_secret;
         client.redirect_uris = res_client.redirect_uris;
-        client.scopes = res_client.scopes;
+        client.scope = res_client.scope;
         client.client_name = res_client.client_name;
         client.grant_types = res_client.grant_types;
         client.response_types = res_client.response_types;
@@ -284,7 +290,7 @@ json update_client_info(Client& client)
             {"client", json::parse(r.text)},
             {"access_token", client.access_token},
             {"refresh_token", client.refresh_token},
-            {"scope", get_scopes(client.scopes)}
+            {"scope", get_scope(client.scope)}
         };
     }
     return {{"error", 
@@ -308,7 +314,8 @@ json delete_client_request(const Client& client)
             {"client", client},
             {"access_token", client.access_token},
             {"refresh_token", client.refresh_token},
-            {"scope", get_scopes(client.scopes)}
+            {"client_uri", Client::client_uri},
+            {"scope", get_scope(client.scope)}
         };
     }
     return {{"error", 
@@ -316,10 +323,10 @@ json delete_client_request(const Client& client)
 }
 
 
-std::unordered_set<std::string> get_scopes(const std::string& scopes)
+std::unordered_set<std::string> get_scope(const std::string& scope)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(scopes);
+    std::istringstream iss(scope);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);
@@ -327,10 +334,10 @@ std::unordered_set<std::string> get_scopes(const std::string& scopes)
 }
 
 
-std::string get_scopes(const std::unordered_set<std::string>& scopes)
+std::string get_scope(const std::unordered_set<std::string>& scope)
 {
     std::ostringstream ss;
-    for (const auto& s: scopes)
+    for (const auto& s: scope)
         ss << s << " ";
     std::string res = ss.str();
     res.pop_back();
@@ -338,7 +345,7 @@ std::string get_scopes(const std::unordered_set<std::string>& scopes)
 }
 
 
-std::string url_encode(const std::string& decoded)
+std::string encode_str(const std::string& decoded)
 {
     const auto encoded_value = curl_easy_escape(
         nullptr, decoded.c_str(), static_cast<int>(decoded.length()));
@@ -347,7 +354,7 @@ std::string url_encode(const std::string& decoded)
     return result;
 }
 
-std::string url_decode(const std::string& encoded)
+std::string decode_str(const std::string& encoded)
 {
     int output_length;
     const auto decoded_value = curl_easy_unescape(
@@ -385,3 +392,10 @@ std::unordered_map<std::string, std::string> parse_form_data(std::string form)
     }
     return res;
 }
+
+void replace_char_by_space(std::string& str, char target)
+{
+    int i;
+    while((i = str.find(target)) != str.npos)
+        str.at(i) = ' ';
+} 

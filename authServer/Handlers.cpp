@@ -32,7 +32,10 @@ inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 
 ProtectedResource resource(
     "resource_id",
-    "http://localhost:9002"
+    std::format(
+		"http://{}:{}", 
+		std::getenv("RESOURCE"), 
+		std::getenv("RESOURCE_PORT"));
 );
 
 
@@ -98,10 +101,10 @@ crow::mustache::rendered_template authorize::operator()(
 		return page.render();
 	}
 	
-	auto scopes = get_scopes(req.url_params.get("scope"));
-	for (const auto& el: scopes)
+	auto scope = get_scope(req.url_params.get("scope"));
+	for (const auto& el: scope)
 	{
-		if(!client->scopes.contains(el))
+		if(!client->scope.contains(el))
 		{	
 			res = env.render(error_temp, {{"error", "invalid scope"}});
 			auto page = crow::mustache::compile(res);
@@ -115,15 +118,15 @@ crow::mustache::rendered_template authorize::operator()(
 	Request request(reqid, req.raw_url);
 	request.create();
 	
-	std::vector<std::string> client_scopes;
-	client_scopes.insert(
-		client_scopes.end(), 
-		client->scopes.begin(), 
-		client->scopes.end()
+	std::vector<std::string> client_scope;
+	client_scope.insert(
+		client_scope.end(), 
+		client->scope.begin(), 
+		client->scope.end()
 	);
     
 	json render_json;
-	render_json["scopes"] = client_scopes;
+	render_json["scope"] = client_scope;
 	render_json["reqid"] = reqid;
 	
 	res = env.render(appr_temp, render_json);
@@ -150,14 +153,14 @@ crow::response approve::operator()(const crow::request& req) const
 	crow::query_string query(request->query);
     Request::destroy(reqid);
     
-	std::unordered_set<std::string> scopes;
-	std::string scope;
+	std::unordered_set<std::string> scope;
+	std::string sc;
 	for (const auto& p: form)
 	{
 		if (p.first.find("scope_") != p.first.npos)
 		{
-			scope = p.first.substr(p.first.find("_") + 1);
-			scopes.insert(scope);
+			sc = p.first.substr(p.first.find("_") + 1);
+			scope.insert(sc);
 		}
 	}
 	
@@ -172,7 +175,7 @@ crow::response approve::operator()(const crow::request& req) const
 		return resp;
 	}
 	
-	if(scopes.empty())
+	if(scope.empty())
 	{
 		url_parsed = build_url(query.get("redirect_uri"), 
 				{{ "error", "denied access"}});
@@ -180,9 +183,9 @@ crow::response approve::operator()(const crow::request& req) const
 		return resp;
 	}
 	
-	for (const auto& el: scopes)
+	for (const auto& el: scope)
 	{
-		if(!client->scopes.contains(el))
+		if(!client->scope.contains(el))
 		{
 			url_parsed = build_url(query.get("redirect_uri"), 
 				{{ "error", "invalid scope"}});
@@ -208,7 +211,7 @@ crow::response approve::operator()(const crow::request& req) const
 	} 
 	
 	std::string code = gen_random(12);
-	Code code_inst(code, request->query, scopes);
+	Code code_inst(code, request->query, scope);
 	
 	code_inst.create();
     
@@ -256,7 +259,7 @@ crow::response token::operator()(const crow::request& req) const
 		return send_error("unsupported_grant_type", 400);
 
 	
-	std::unordered_set<std::string> scopes;
+	std::unordered_set<std::string> scope;
 	if (body.at("grant_type") == "authorization_code")
 	{
 		if (!body.contains("code"))
@@ -265,7 +268,7 @@ crow::response token::operator()(const crow::request& req) const
 		std::shared_ptr<Code> cod = Code::get(body.at("code"));
 		if (!cod)
 			return send_error("invalid_grant", 400);
-		scopes = cod->scopes;
+		scope = cod->scope;
 		Code::destroy(body.at("code"));
 		crow::query_string query(cod->query);	
 
@@ -297,7 +300,7 @@ crow::response token::operator()(const crow::request& req) const
 			return send_error("invalid_grant", 400);
 		}
 
-		scopes = old_token->scopes;
+		scope = old_token->scope;
 	}
 	const auto now = std::chrono::system_clock::now();
 	const auto exp = now + std::chrono::days(10);
@@ -313,12 +316,12 @@ crow::response token::operator()(const crow::request& req) const
     auto access_token = jwt::create()
 		.set_type("JWT")
 		.set_algorithm("RS256")
-		.set_issuer("http://localhost:9001/")
-		.set_audience("http://localhost:9002/")
+		.set_issuer(server_uri)
+		.set_audience(resource.resource_uri)
 		.set_payload_claim("expire", 
 			jwt::claim(std::to_string(expire)))
 		.set_payload_claim("scope", 
-			jwt::claim(std::string(get_scopes(scopes))))
+			jwt::claim(std::string(get_scope(scope))))
 		.set_id("authserver")
 		.sign(jwt::algorithm::rs256("", prk, "", ""));
 
@@ -328,15 +331,15 @@ crow::response token::operator()(const crow::request& req) const
 		.sign(jwt::algorithm::rs256("", prk, "", ""));
 	
 	
-	Token::create(access_token, client_id, expire, scopes);
-	Token::create(refresh_token, client_id, 0, scopes);
+	Token::create(access_token, client_id, expire, scope);
+	Token::create(refresh_token, client_id, 0, scope);
 	
 	json res_resp = { 
 		{"access_token", access_token}, 
 		{"token_type", "Bearer"},
 		{"access_token expire", std::format("{:%Y%m%d%H%M}", exp)},
 		{"refresh_token", refresh_token },
-		{ "scope", get_scopes(scopes) } 
+		{ "scope", get_scope(scope) } 
 	};
 	
 	resp.code = 200;
@@ -451,7 +454,6 @@ crow::response register_handler::operator()(const crow::request& req) const
 	
 	crow::response resp;
 	json body = new_client;
-	
 	new_client.save();
 	
 	resp.code = 201;
@@ -479,11 +481,15 @@ crow::response client_management_handler::operator()(
 	else if (req.method == crow::HTTPMethod::PUT)
 	{
 		json body = json::parse(req.body);
+		CROW_LOG_WARNING << body.dump(4);
+
 		bool client_id_varif = body.contains("client_id") && 
-			body["client_id"] == client.client_id;
+			(body["client_id"].template get<std::string>() 
+				== client.client_id);
 		bool client_secret_varif = body.contains("client_secret") && 
-			body["client_secret"] == client.client_id;
-		   
+			(body["client_secret"].template get<std::string>() 
+				== client.client_secret);
+		
 		if (!(client_id_varif && client_secret_varif))
 		{
 			CROW_LOG_WARNING << "PUT; client varification error";
@@ -505,7 +511,7 @@ crow::response client_management_handler::operator()(
 			req_client.token_endpoint_auth_method;
 		result_client.redirect_uris = req_client.redirect_uris;
 		result_client.client_uri = req_client.client_uri;
-		result_client.scopes = req_client.scopes;
+		result_client.scope = req_client.scope;
 		result_client.grant_types = req_client.grant_types;
 		result_client.response_types = req_client.response_types;
 		result_client.client_name = req_client.client_name;
@@ -513,6 +519,7 @@ crow::response client_management_handler::operator()(
 		result_client.save();
 		
 		json jresp = result_client;
+		CROW_LOG_WARNING << jresp;
 		resp.body = jresp.dump();
 		resp.code = 200;
 	}
@@ -531,27 +538,3 @@ crow::response client_management_handler::operator()(
 	}
     return resp;
 }
-
-// {
-// "client_name": "OAuth Client",
-// "redirect_uris": ["http://localhost:9000/callback"],
-// "client_uri": "http://localhost:9000/",
-// "grant_types": ["authorization_code"],
-// "scope": "foo bar baz"
-// }
-
-// {
-// "client_id": "1234-wejeg-0392",
-// "client_secret": "6trfvbnklp0987trew2345tgvcxcvbjkiou87y6t5r",
-// "client_id_issued_at": 2893256800,
-// "client_secret_expires_at": 0,
-// "token_endpoint_auth_method": "client_secret_basic",
-// "client_name": "OAuth Client",
-// "redirect_uris": ["http://localhost:9000/callback"],
-// "client_uri": "http://localhost:9000/",
-// "grant_types": ["authorization_code"],
-// "response_types": ["code"],
-// "scope": "foo bar baz",
-// "registration_client_uri": "http://localhost:9001/register/1234-wejeg-0392"
-// "registration_access_token": "ogh238fj2f0zFaj38dA"
-// }

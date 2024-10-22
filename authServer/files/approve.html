@@ -41,8 +41,8 @@
         <input type="hidden" name="reqid" value="{{ reqid }}">
         <p>The client is requesting access to the following:</p>
         <ul>
-        {% for scope in scopes %}
-            <li><input type="checkbox" name="scope_{{ scope }}" id="scope_{{ scope }}" checked="checked"> <label for="scope_{{ scope }}">{{ scope }}</label></li>
+        {% for sc in scope %}
+            <li><input type="checkbox" name="scope_{{ sc }}" id="scope_{{ sc }}" checked="checked"> <label for="scope_{{ sc }}">{{ sc }}</label></li>
         {% endfor %}
         </ul>
         <input type="submit" class="btn btn-success" name="approve" value="Approve">

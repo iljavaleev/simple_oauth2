@@ -15,6 +15,6 @@ jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier(
     const std::string& pk);
 void send_error(crow::response& res, std::string&& message, int code);
 json parse_token_info(const std::string& token);
-std::unordered_set<std::string> get_scopes(const std::string& scope);
+std::unordered_set<std::string> get_scope(const std::string& scope);
 
 #endif

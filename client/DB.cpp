@@ -26,7 +26,7 @@ models::Client::token_endpoint_auth_methods{
 
 const std::string 
 models::Client::client_uri = std::format(
-    "{}:{}", 
+    "http://{}:{}", 
     std::getenv("CLIENT"), 
     std::getenv("CLIENT_PORT")
 );
@@ -84,7 +84,7 @@ namespace models
 
         doc.append(kvp("scope", [this](sub_array child) 
         {
-            for (const auto& s : scopes) 
+            for (const auto& s : scope) 
             {
                 child.append(s);
             }
@@ -124,7 +124,7 @@ namespace models
         
         subarr = client["scope"].get_array().value;
         for (bsoncxx::array::element ele : subarr)
-            client_res->scopes.insert(
+            client_res->scope.insert(
                 bsoncxx::string::to_string(ele.get_string().value)
             );
 
@@ -142,6 +142,12 @@ namespace models
         
         client_res->client_id = bsoncxx::string::to_string(
             client["client_id"].get_string().value);
+
+        client_res->access_token = bsoncxx::string::to_string(
+            client["access_token"].get_string().value);
+
+        client_res->refresh_token = bsoncxx::string::to_string(
+            client["refresh_token"].get_string().value);
 
         client_res->token_endpoint_auth_method = bsoncxx::string::to_string(
             client["token_endpoint_auth_method"].get_string().value);
@@ -235,7 +241,7 @@ namespace models
             {"refresh_token", cl.refresh_token},
             {"client_id", cl.client_id}, 
             {"client_secret", cl.client_secret}, 
-            {"scopes", json(cl.scopes)}, 
+            {"scope", json(cl.scope)}, 
             {"redirect_uris", json(cl.redirect_uris)},
             {"client_id_created_at", cl.client_id_created_at},
             {"client_id_expires_at", cl.client_id_expires_at},
@@ -250,11 +256,13 @@ namespace models
 
     void from_json(const json& j, Client& cl) 
     {
-        j.at("access_token").get_to(cl.access_token);
-        j.at("refresh_token").get_to(cl.refresh_token);
+        if (j.contains("access_token"))
+            j.at("access_token").get_to(cl.access_token);
+        if (j.contains("refresh_token"))
+            j.at("refresh_token").get_to(cl.refresh_token);
         j.at("client_id").get_to(cl.client_id);
         j.at("client_secret").get_to(cl.client_secret);
-        j.at("scopes").get_to(cl.scopes);
+        j.at("scope").get_to(cl.scope);
         j.at("redirect_uris").get_to(cl.redirect_uris);
         j.at("client_id_created_at").get_to(cl.client_id_created_at);
         j.at("client_id_expires_at").get_to(cl.client_id_expires_at);

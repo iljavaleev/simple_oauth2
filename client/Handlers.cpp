@@ -18,6 +18,8 @@ const std::string WORKDIR = std::getenv("WORKDIR");
 inja::Template error_temp = env.parse_template(WORKDIR + "/files/error.html");
 inja::Template data_temp = env.parse_template(WORKDIR + "/files/data.html");
 inja::Template index_temp = env.parse_template(WORKDIR + "/files/index.html");
+inja::Template client_info_temp = 
+    env.parse_template(WORKDIR + "/files/client_info.html");
 
 
 const std::string protected_resource = std::format(
@@ -40,8 +42,8 @@ crow::mustache::rendered_template idx::operator()(
         client.access_token : "NONE";
     render_json["refresh_token"] = !client.refresh_token.empty() ? 
         client.refresh_token : "NONE";
-    render_json["scope"] = !client.scopes.empty() ? 
-        get_scopes(client.scopes) : "NONE";
+    render_json["scope"] = !client.scope.empty() ? 
+        get_scope(client.scope) : "NONE";
     render_json["client"] = client_json;
     std::string res = env.render(index_temp, render_json);
     auto page = crow::mustache::compile(res);
@@ -68,8 +70,8 @@ crow::response authorize::operator()(const crow::request& req) const
     json options = {
         {"response_type", "code"},
         {"client_uri", Client::client_uri},
-        {"scope", !client.scopes.empty() ? 
-            get_scopes(client.scopes) : "foo bar"},
+        {"scope", !client.scope.empty() ? 
+            get_scope(client.scope) : "foo bar"},
 	    {"client_id", client.client_id},
 		{"redirect_uri", client.redirect_uris.at(0)},
 		{"state", state->state}
@@ -122,11 +124,13 @@ crow::mustache::rendered_template callback::operator()(
     }
     else
     {
+        json jclient = client;
         render_json = {
             {"access_token", client.access_token},
             {"refresh_token", !client.refresh_token.empty() ? 
                 client.refresh_token : "None"},
-            {"scope", get_scopes(client.scopes)}
+            {"scope", get_scope(client.scope)},
+            {"client", jclient }
         };
         client.save();
         templ = index_temp;
@@ -181,15 +185,16 @@ crow::mustache::rendered_template revoke_handler::operator()(
     if (status >= 200 && status < 300)
     {
         client.access_token.clear();
-        client.scopes.clear();
+        client.scope.clear();
         client.save();
-        json render_json;
+        json render_json, jclient = client;
         render_json["access_token"] = !client.access_token.empty() ? 
             client.access_token : "NONE";
         render_json["refresh_token"] = !client.refresh_token.empty() ? 
             client.refresh_token : "NONE";
-        render_json["scope"] = !client.scopes.empty() ? 
-            get_scopes(client.scopes) : "NONE";
+        render_json["scope"] = !client.scope.empty() ? 
+            get_scope(client.scope) : "NONE";
+        render_json["client"] = jclient;
         res = env.render(index_temp, render_json);
     }
     else
@@ -216,8 +221,8 @@ crow::mustache::rendered_template revoke_refresh_handler::operator()(
             client.access_token : "NONE";
         render_json["refresh_token"] = !client.refresh_token.empty() ? 
             client.refresh_token : "NONE";
-        render_json["scope"] = !client.scopes.empty() ? 
-            get_scopes(client.scopes) : "NONE";
+        render_json["scope"] = !client.scope.empty() ? 
+            get_scope(client.scope) : "NONE";
         res = env.render(index_temp, render_json);
     }
     else
@@ -229,7 +234,6 @@ crow::mustache::rendered_template revoke_refresh_handler::operator()(
 }
 
 
-
 crow::mustache::rendered_template read_client::operator()(
     const crow::request&) const
 {
@@ -238,11 +242,15 @@ crow::mustache::rendered_template read_client::operator()(
     
     if (response.contains("error"))
     {
-        res = env.render(error_temp, response["error"]);
+        res = env.render(error_temp, response);
     }
     else
     {
-        res = env.render(data_temp, response);
+        res = env.render(client_info_temp, response);
+        client.client_secret = response["client"]["client_secret"];
+        client.registration_access_token = 
+            response["client"]["registration_access_token"];
+        client.save();
     }
     auto page = crow::mustache::compile(res);
     return page.render();
@@ -252,12 +260,12 @@ crow::mustache::rendered_template read_client::operator()(
 crow::mustache::rendered_template update_client::operator()(
     const crow::request& req) const
 {
-    json response = update_client_info(client);
     std::string res;
     auto form_data = parse_form_data(req.body);
     try
     {
         client.client_name = form_data.at("client_name");
+        replace_char_by_space(client.client_name, '+');
     }
     catch(const std::exception& e)
     {
@@ -266,10 +274,11 @@ crow::mustache::rendered_template update_client::operator()(
         auto page = crow::mustache::compile(res);
         return page.render();
     }
-         
+    
+    json response = update_client_info(client);
     if (response.contains("error"))
     {
-        res = env.render(error_temp, response["error"]);
+        res = env.render(error_temp, response);
     }
     else
     {
@@ -289,7 +298,7 @@ crow::mustache::rendered_template delete_client::operator()(
     
     if (response.contains("error"))
     {
-        res = env.render(error_temp, response["error"]);
+        res = env.render(error_temp, response);
     }
     else
     {

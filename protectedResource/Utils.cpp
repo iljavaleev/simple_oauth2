@@ -63,10 +63,10 @@ json parse_token_info(const std::string& token)
     return result;
 }
 
-std::unordered_set<std::string> get_scopes(const std::string& scopes)
+std::unordered_set<std::string> get_scope(const std::string& scope)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(scopes);
+    std::istringstream iss(scope);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);

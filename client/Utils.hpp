@@ -29,11 +29,12 @@ json get_answer(const Client& client, const std::string& uri);
 json get_client_info(const Client& client);
 json update_client_info(Client& client);
 json delete_client_request(const Client& client);
-std::unordered_set<std::string> get_scopes(const std::string& query);
-std::string get_scopes(const std::unordered_set<std::string>& scopes);
-std::string url_decode(const std::string& encoded);
-std::string url_encode(const std::string& decoded);
+std::unordered_set<std::string> get_scope(const std::string& query);
+std::string get_scope(const std::unordered_set<std::string>& scope);
+std::string decode_str(const std::string& encoded);
+std::string encode_str(const std::string& decoded);
 unsigned int revoke_token(Client& client, std::string&& type);
 std::unordered_map<std::string, std::string> parse_form_data(std::string form);
+void replace_char_by_space(std::string&, char); 
 
 #endif

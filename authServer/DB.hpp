@@ -99,7 +99,7 @@ namespace models
         std::string client_id;
         std::string client_secret;
         std::vector<std::string> redirect_uris;
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
         
         time_t client_id_created_at;
         time_t client_id_expires_at;
@@ -134,12 +134,12 @@ namespace models
     {
         std::string code;
         std::string query;
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
         Code(
             const std::string& _code,
             const std::string& _query, 
-            const std::unordered_set<std::string> _scopes):
-            code(_code), query(_query), scopes(_scopes){}
+            const std::unordered_set<std::string> _scope):
+            code(_code), query(_query), scope(_scope){}
         
         void create();
         static std::shared_ptr<Code> get(const std::string& code);
@@ -152,16 +152,16 @@ namespace models
         std::string token;
         std::string client_id;
         time_t expire; 
-        std::unordered_set<std::string> scopes;
+        std::unordered_set<std::string> scope;
         Token(
             const std::string& _token, 
             const std::string& _client_id,
             time_t _expire,
-            const std::unordered_set<std::string> _scopes):
+            const std::unordered_set<std::string> _scope):
         token(_token), 
         client_id(_client_id), 
         expire(_expire), 
-        scopes(_scopes){}
+        scope(_scope){}
     
         void create();
         
@@ -169,7 +169,7 @@ namespace models
             const std::string& token,
             const std::string& client_id, 
             std::time_t exp,
-            std::unordered_set<std::string> scopes
+            std::unordered_set<std::string> scope
         );
         
         static std::shared_ptr<Token> get(const std::string& token, 

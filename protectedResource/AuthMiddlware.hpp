@@ -98,17 +98,17 @@ struct AuthMW: crow::ILocalMiddleware
             return; 
         }
             
-        std::unordered_set<std::string> possible_scopes{"foo", "bar"}, 
-            token_scopes{get_scopes(token_inst["scope"])};
-        for (const auto& s: token_scopes)
-            if (!possible_scopes.contains(s))
+        std::unordered_set<std::string> possible_scope{"foo", "bar"}, 
+            token_scope{get_scope(token_inst["scope"])};
+        for (const auto& s: token_scope)
+            if (!possible_scope.contains(s))
             {
                 send_error(res, "no such scope exists", 401);
                 res.end();
                 return;
             }
             
-        ctx.scope = token_scopes;
+        ctx.scope = token_scope;
     }
 
     void after_handle(crow::request& req, crow::response& res, context& ctx){}
