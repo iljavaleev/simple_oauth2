@@ -216,13 +216,14 @@ crow::mustache::rendered_template revoke_refresh_handler::operator()(
         client.access_token.clear();
         client.refresh_token.clear();
         client.save();
-        json render_json;
+        json render_json, jclient = client;
         render_json["access_token"] = !client.access_token.empty() ? 
             client.access_token : "NONE";
         render_json["refresh_token"] = !client.refresh_token.empty() ? 
             client.refresh_token : "NONE";
         render_json["scope"] = !client.scope.empty() ? 
             get_scope(client.scope) : "NONE";
+        render_json["client"] = jclient;
         res = env.render(index_temp, render_json);
     }
     else

@@ -37,6 +37,7 @@
         <p>Refresh token value: <span class="label label-danger">
           {% if refresh_token %} {{ refresh_token }} {% else %} NONE {% endif %}
         </span></p>
+        
         <p>Client ID: <span class="label label-danger">
           {% if client.client_id %} {{ client.client_id }} {% else %} NONE {% endif %}
         </span></p>
@@ -61,6 +62,12 @@
           </form>
         <a class="btn btn-default" href="/unregister_client">Unregister Client</a> 
         {% endif %}
+        <form action="/revoke_access" class="form" method="POST">
+          <input type="submit" class="btn btn-default" value="Revoke Access Token" />
+        </form>
+        <form action="/revoke_refresh" class="form" method="POST">
+          <input type="submit" class="btn btn-default" value="Revoke Refresh Token" />
+        </form>
       </div>
 
     </div>

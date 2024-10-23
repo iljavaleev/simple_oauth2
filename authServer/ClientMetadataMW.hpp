@@ -159,10 +159,9 @@ struct ClientMetadataMW: crow::ILocalMiddleware
             {
                 CROW_LOG_WARNING <<  body["scope"];
                 new_client.scope = 
-                    body["scope"].template get<std::unordered_set<std::string>>();
+                    body["scope"].
+                    template get<std::unordered_set<std::string>>();
             }
-            json a = new_client;
-            CROW_LOG_WARNING << a.dump();
             ctx.new_client = new_client;
         }    
     }

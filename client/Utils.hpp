@@ -28,7 +28,7 @@ void register_client(Client& client);
 json get_answer(const Client& client, const std::string& uri);
 json get_client_info(const Client& client);
 json update_client_info(Client& client);
-json delete_client_request(const Client& client);
+json delete_client_request(Client& client);
 std::unordered_set<std::string> get_scope(const std::string& query);
 std::string get_scope(const std::unordered_set<std::string>& scope);
 std::string decode_str(const std::string& encoded);

@@ -298,7 +298,7 @@ json update_client_info(Client& client)
 }
 
 
-json delete_client_request(const Client& client)
+json delete_client_request(Client& client)
 {
     cpr::Response r = cpr::Delete(
         cpr::Url{client.registration_client_uri},
@@ -307,15 +307,16 @@ json delete_client_request(const Client& client)
         }
     );
     Client::destroy(client.client_id);
-    
+    Client new_client;
+    client = new_client;
+    json j_client = client;
     if (r.status_code == 204)
     {
         return {
-            {"client", client},
-            {"access_token", client.access_token},
-            {"refresh_token", client.refresh_token},
-            {"client_uri", Client::client_uri},
-            {"scope", get_scope(client.scope)}
+            {"client", j_client},
+            {"access_token", "None"},
+            {"refresh_token", "None"},
+            {"scope", "None"}
         };
     }
     return {{"error", 

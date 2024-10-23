@@ -35,7 +35,7 @@ ProtectedResource resource(
     std::format(
 		"http://{}:{}", 
 		std::getenv("RESOURCE"), 
-		std::getenv("RESOURCE_PORT"));
+		std::getenv("RESOURCE_PORT"))
 );
 
 
@@ -194,7 +194,8 @@ crow::response approve::operator()(const crow::request& req) const
 		}
 	}
 	
-	if (form.at("approve").empty())
+	if ((form.contains("approve") && form.at("approve").empty()) || 
+		form.contains("deny"))
 	{
 		url_parsed = build_url(query.get("redirect_uri"), 
             {{ "error", "access_denied"}});
@@ -481,7 +482,6 @@ crow::response client_management_handler::operator()(
 	else if (req.method == crow::HTTPMethod::PUT)
 	{
 		json body = json::parse(req.body);
-		CROW_LOG_WARNING << body.dump(4);
 
 		bool client_id_varif = body.contains("client_id") && 
 			(body["client_id"].template get<std::string>() 
@@ -519,16 +519,14 @@ crow::response client_management_handler::operator()(
 		result_client.save();
 		
 		json jresp = result_client;
-		CROW_LOG_WARNING << jresp;
 		resp.body = jresp.dump();
 		resp.code = 200;
 	}
 	else if (req.method == crow::HTTPMethod::DELETE)
 	{
-		json body = json::parse(req.body);
 		try
 		{
-			models::Client::destroy(body["client_id"]);
+			models::Client::destroy(client.client_id);
 		}
 		catch(const std::exception& e)
 		{
