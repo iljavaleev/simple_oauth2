@@ -2,10 +2,6 @@
 #include "AuthMiddlware.hpp"
 #include "Handlers.hpp"
 
-ProtectedResource resource(
-    "resource_id",
-    "http://localhost:9002"
-);
 
 int main()
 {

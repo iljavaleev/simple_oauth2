@@ -21,6 +21,7 @@ const std::string WORKDIR = std::getenv("WORKDIR");
 
 
 std::string gen_random(const int len) {
+    srand((unsigned)time(NULL) * getpid());
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -105,6 +106,7 @@ std::unordered_map<std::string, std::string> parse_form_data(std::string form)
     return res;
 }
 
+
 crow::response send_error(std::string&& message, int code)
 {
     crow::response resp;
@@ -113,6 +115,15 @@ crow::response send_error(std::string&& message, int code)
     resp.body =  j.dump();
     return resp;
 }
+
+
+void send_error(crow::response& resp, std::string&& message, int code)
+{
+    resp.code = code;
+    json j = {{ "error", message }};
+    resp.body = j.dump();
+}
+
 
 std::string url_encode(const std::string& decoded)
 {
@@ -138,10 +149,10 @@ std::string url_decode(const std::string& encoded)
 }
 
 
-std::unordered_set<std::string> get_scopes(const std::string& scopes)
+std::unordered_set<std::string> get_scope(const std::string& scope)
 {
     std::unordered_set<std::string> res;
-    std::istringstream iss(scopes);
+    std::istringstream iss(scope);
     std::string s;
     while (getline(iss, s, ' ')) 
         res.insert(s);
@@ -149,15 +160,16 @@ std::unordered_set<std::string> get_scopes(const std::string& scopes)
 }
 
 
-std::string get_scopes(const std::unordered_set<std::string>& scopes)
+std::string get_scope(const std::unordered_set<std::string>& scope)
 {
     std::ostringstream ss;
-    for (const auto& s: scopes)
+    for (const auto& s: scope)
         ss << s << " ";
     std::string res = ss.str();
     res.pop_back();
     return res;
 }
+
 
 jwt::verifier<jwt::default_clock, jwt::traits::kazuho_picojson> get_verifier()
 {

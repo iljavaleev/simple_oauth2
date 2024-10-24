@@ -11,14 +11,13 @@
 #include "Utils.hpp"
 
 using json = nlohmann::json;
-extern ProtectedResource resource;
 
+inline ProtectedResource resource("resource_id", "http://localhost:9002");
 
 struct AuthMW: crow::ILocalMiddleware
 {
     struct context
     {
-        std::string token{};
         std::unordered_set<std::string> scope;
     };
 
@@ -71,6 +70,7 @@ struct AuthMW: crow::ILocalMiddleware
             res.end();
             return;
         }  
+        
         try
         {
            get_verifier(pk).verify(jwt::decode(token));
@@ -83,16 +83,11 @@ struct AuthMW: crow::ILocalMiddleware
             return;
         }
         
-        auto token_inst = DB::get(token);
+        json token_inst = parse_token_info(token);
 
-        if(!token_inst)
-        {   
-            send_error(res, "no such access token exists", 401);
-            res.end();
-            return; 
-        }
-            
-        const long exp = token_inst->expire;
+        const std::time_t exp = std::stol(
+            token_inst["expire"].template get<std::string>());
+
         const std::chrono::time_point now{std::chrono::system_clock::now()};
         const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
         
@@ -103,18 +98,17 @@ struct AuthMW: crow::ILocalMiddleware
             return; 
         }
             
-        std::unordered_set<std::string> possible_scopes{"foo", "bar"};
-        
-        for (const auto& s: token_inst->scopes)
-            if (!possible_scopes.contains(s))
+        std::unordered_set<std::string> possible_scope{"foo", "bar"}, 
+            token_scope{get_scope(token_inst["scope"])};
+        for (const auto& s: token_scope)
+            if (!possible_scope.contains(s))
             {
                 send_error(res, "no such scope exists", 401);
                 res.end();
                 return;
             }
-                
-        ctx.token = token_inst->token;
-        ctx.scope = token_inst->scopes;
+            
+        ctx.scope = token_scope;
     }
 
     void after_handle(crow::request& req, crow::response& res, context& ctx){}

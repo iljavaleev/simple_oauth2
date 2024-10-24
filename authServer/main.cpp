@@ -3,27 +3,14 @@
 #include <vector>  
         
 #include "DB.hpp"         
-#include "Handlers.hpp"    
-
-
-Client client(
-    "oauth-client-1", 
-    "oauth-client-secret-1", 
-    {"http://localhost:9000/callback"},
-    "foo bar"
-);
-
-ProtectedResource resource(
-    "resource_id",
-    "http://localhost:9002"
-);
+#include "Handlers.hpp"  
+#include "ClientMetadataMW.hpp"
+#include "AuthorizeConfigurationMW.hpp"  
 
 
 int main()
-{
-    client.create();
-    
-    crow::SimpleApp app;
+{ 
+    crow::App<ClientMetadataMW, AuthorizeConfigurationMW> app;
     app.loglevel(crow::LogLevel::Warning);
     CROW_ROUTE(app, "/")
     .methods(crow::HTTPMethod::GET)(idx());
@@ -42,6 +29,18 @@ int main()
 
     CROW_ROUTE(app, "/revoke").methods(
         crow::HTTPMethod::POST)(revoke_handler());
+
+    CROW_ROUTE(app, "/register")
+    .CROW_MIDDLEWARES(app, ClientMetadataMW)
+    .methods(crow::HTTPMethod::POST)(register_handler(app));
+    
+    CROW_ROUTE(app, "/register/<string>")
+    .CROW_MIDDLEWARES(app, ClientMetadataMW, AuthorizeConfigurationMW)
+    .methods(
+        crow::HTTPMethod::GET, 
+        crow::HTTPMethod::PUT, 
+        crow::HTTPMethod::DELETE)
+        (client_management_handler(app));
     app.port(9001).run();
     return 0;
 }

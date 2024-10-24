@@ -36,7 +36,6 @@ crow::mustache::rendered_template idx::operator()(
 crow::response Resource::operator()(const crow::request& req) const
 {
     const auto& ctx = app.get_context<AuthMW>(req);
-    std::string token = ctx.token;
     std::unordered_set<std::string> scope = ctx.scope;
     json resp_json;
     for (const auto& s: scope)

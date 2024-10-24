@@ -7,18 +7,6 @@
 #include <format>
 
 #include "crow.h"
-#include <nlohmann/json.hpp>
-
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/client.hpp>
-
-
-using bsoncxx::builder::basic::kvp;
-using bsoncxx::builder::basic::make_array;
-using bsoncxx::builder::basic::make_document;
- 
-inline mongocxx::instance instance{};
 
 
 struct ProtectedResource
@@ -29,44 +17,22 @@ struct ProtectedResource
         resource_id(id), resource_uri(uri){}
 };
 
+
 struct Token
 {
     std::string token;
     std::string client_id;
     time_t expire; 
-    std::unordered_set<std::string> scopes;
+    std::unordered_set<std::string> scope;
     Token(
         const std::string& _token, 
         const std::string& _client_id,
         time_t _expire,
-        const std::unordered_set<std::string> _scopes):
+        const std::unordered_set<std::string> _scope):
     token(_token), 
     client_id(_client_id), 
     expire(_expire), 
-    scopes(_scopes){}
+    scope(_scope){}
 };
-
-
-class DB
-{
-    mongocxx::uri uri;
-    mongocxx::client client;
-    mongocxx::database db;
-    mongocxx::collection collection;
-public:
-    DB(const std::string _db = "auth", const std::string _coll = "server")
-    {   
-        uri = mongocxx::uri(std::format("mongodb://{}:{}", 
-            std::getenv("MONGODB_HOST"),
-            std::getenv("MONGODB_PORT")
-        ));
-        client = mongocxx::client(uri);
-        db = client[_db]; 
-        collection = db[_coll];
-    }
-    mongocxx::collection get_collection() { return collection; }
-    static std::shared_ptr<Token> get(const std::string& token);
-};
-
 
 #endif

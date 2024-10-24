@@ -1,68 +1,85 @@
 
 services:
 
-  mongodb:
+  mongodb_auth:
     image: mongo
-    container_name: mongo
+    container_name: mongo_auth
     env_file: "./.env"
     ports:
-      - ${MONGODB_PORT}:${MONGODB_PORT}
+      - ${AUTH_MONGODB_PORT}:${AUTH_MONGODB_PORT}
+    volumes:
+      - 'auth_db_data:/data/db'
+      - 'auth_db_config:/data/configdb'
+    networks:
+      - services 
+
+  mongodb_client:
+    image: mongo
+    container_name: mongodb_client
+    command: mongod --port 27018
+    env_file: "./.env"
+    ports:
+      - ${CLIENT_MONGODB_PORT}:${CLIENT_MONGODB_PORT}
+    volumes:
+      - 'client_db_data:/data/db'
+      - 'client_db_config:/data/configdb'
     networks:
       - services 
 
   server:
-    image: valeevilja/oauth2_server:v1
+    image: valeevilja/server:v1
     env_file: "./.env"
     container_name: ${SERVER}
     restart: always
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     environment:
-      - MONGODB_PORT=${MONGODB_PORT}
-      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${AUTH_MONGODB_PORT}
+      - MONGODB_HOST=${AUTH_MONGODB_HOST}
     volumes:
       - ./:/server
     networks:
       - services 
     depends_on:
-      - mongodb
+      - mongodb_auth
 
   client:
-    image: valeevilja/oauth2_client:v1
+    image: valeevilja/client:v1
     env_file: "./.env"
     container_name: ${CLIENT}
     restart: always
     ports:
       - ${CLIENT_PORT}:${CLIENT_PORT}
     environment:
-      - MONGODB_PORT=${MONGODB_PORT}
-      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${CLIENT_MONGODB_PORT}
+      - MONGODB_HOST=${CLIENT_MONGODB_HOST}
     volumes:
       - ./:/client
     networks:
       - services 
     depends_on:
-      - mongodb
+      - mongodb_client
 
   resource:
-    image: valeevilja/oauth2_resource:v1
+    image: valeevilja/resource:v1
     env_file: "./.env"
     container_name: ${RESOURCE}
     restart: always
     ports:
       - ${RESOURCE_PORT}:${RESOURCE_PORT}
-    environment:
-      - MONGODB_PORT=${MONGODB_PORT}
-      - MONGODB_HOST=${MONGODB_HOST}
     volumes:
       - ./:/resource
     networks:
       - services 
-    depends_on:
-      - mongodb  
 
 volumes:
-  mongodbdata:
+  auth_db_data:
+    driver: local
+  auth_db_config:
+    driver: local
+  client_db_data:
+    driver: local
+  client_db_config:
     driver: local
 
 networks:
