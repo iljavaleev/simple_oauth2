@@ -17,10 +17,10 @@ using Server = models::Server;
 const std::string server_uri = std::format(
     "http://{}:{}", std::getenv("SERVER"), std::getenv("SERVER_PORT"));
 
-const std::string client_uri = std::format(
+const std::string client_internal_uri = std::format(
     "http://{}:{}", 
-    std::getenv("CLIENT"), 
-    std::getenv("CLIENT_PORT")
+    std::getenv("CLIENT_INTERNAL"), 
+    std::getenv("CLIENT_PORT_INTERNAL")
 );
 
 
@@ -137,8 +137,8 @@ void register_client(Client& client)
 {   
     json j = {
         {"client_name", "Test name"},
-        {"client_uri", client_uri},
-        {"redirect_uris", {client_uri + "/callback"}},
+        {"client_uri", client_internal_uri},
+        {"redirect_uris", {client_internal_uri + "/callback"}},
         {"grant_types", {"authorization_code"}},
         {"response_types", {"code"}},
         {"scope", "foo bar"},

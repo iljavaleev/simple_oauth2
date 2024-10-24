@@ -526,6 +526,7 @@ crow::response client_management_handler::operator()(
 	{
 		try
 		{
+			Token::destroy_all(client.client_id);
 			models::Client::destroy(client.client_id);
 		}
 		catch(const std::exception& e)

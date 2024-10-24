@@ -157,7 +157,6 @@ struct ClientMetadataMW: crow::ILocalMiddleware
             }
             else if (body.contains("scope"))
             {
-                CROW_LOG_WARNING <<  body["scope"];
                 new_client.scope = 
                     body["scope"].
                     template get<std::unordered_set<std::string>>();

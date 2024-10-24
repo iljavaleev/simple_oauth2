@@ -407,7 +407,8 @@ namespace models
         std::string token_type(std::move(type));
 
         auto doc = db->get_token_collection().
-            find_one(make_document(kvp(token_type, std::to_string(hash_token))));
+            find_one(
+                make_document(kvp(token_type, std::to_string(hash_token))));
         if (!doc)
             return std::shared_ptr<Token>();
         std::unordered_set<std::string> scope;
@@ -418,8 +419,10 @@ namespace models
         
         
         return std::make_shared<Token>(
-            bsoncxx::string::to_string(doc->view()[token_type].get_string().value),
-            bsoncxx::string::to_string(doc->view()["client_id"].get_string().value),
+            bsoncxx::string::to_string(
+                doc->view()[token_type].get_string().value),
+            bsoncxx::string::to_string(
+                doc->view()["client_id"].get_string().value),
             doc->view()["expire"].get_int64(),
             scope
         );
